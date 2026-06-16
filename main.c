@@ -8,6 +8,8 @@ int main() {
     PmError err = Pm_Initialize();
     if (err != pmNoError) {
         printf("Failed to initialize PortMidi: %s/n", Pm_GetErrorText(err));
+        Pm_Terminate();
+        return -1;
     };
     printf("Initilization Complete\n");
 
@@ -16,29 +18,36 @@ int main() {
     int num_of_devices = Pm_CountDevices();
     if (num_of_devices < 0) {
         printf("No MIDI devices found");
+        Pm_Terminate();
+        return -1;
     };
     printf("%d MIDI divces found\n", num_of_devices);
 
-    // Get the numebr of devices. By default, the computer has two. 
+    // Get the number of devices. By default, the computer has two, an input and an output.
     printf("Devices available are: \n");
     for (int i = 0; i < num_of_devices; i++)
     {
-        if (Pm_GetDeviceInfo(i) == NULL) {
+        // Pm_GetDeviceInfo - takes an id as a parameter
+        const PmDeviceInfo *device = Pm_GetDeviceInfo(i);
+        // if id is out of range or if the device designates a deleted virtual device, the function returns NULL.
+        if (device == NULL) {
             printf("Device id is out of range or null\n");
+            Pm_Terminate();
+            return -1;
         }
-        printf("%s ", Pm_GetDeviceInfo(i)->name);
-        if (Pm_GetDeviceInfo(i)->input != 1) {
+        printf("%s ", device->name);
+        if (device->input != 1) {
             printf("- OUTPUT\n");
         } else {
             printf("- INPUT\n");
         }
     };
     
-
     // call after using PortMidi
     err = Pm_Terminate();
     if (err != pmNoError) {
         printf("Failed to terminate PortMidi: %s/n", Pm_GetErrorText(err));
+        return -1;
     };
     printf("Termination Complete\n");
     return 0;
