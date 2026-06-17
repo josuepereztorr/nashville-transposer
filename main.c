@@ -114,6 +114,43 @@ int main() {
         printf("You have selected %d\n", selected_id);
 
     }
+
+    // open a connection to the selected midi device
+    PortMidiStream *stream = NULL;
+    err = Pm_OpenInput(&stream, selected_id, NULL, 512, NULL, NULL);
+    if (err != pmNoError) {
+        printf("Failed to initialize PortMidi: %s/n", Pm_GetErrorText(err));
+        Pm_Terminate();
+        return -1;
+    };
+
+    // PmEvent
+    PmEvent buffer[1];
+    int result;
+
+    // loop while waiting for data
+    // TODO - ADD ERROR HANDLING
+    while (1) {
+        // check if 
+        if (Pm_Poll(stream)) {
+            result = Pm_Read(stream, buffer, 1);
+        }
+
+        if (result > 0) {
+            printf("Status: %d  Note: %d  Velocity: %d\n",
+            Pm_MessageStatus(buffer[0].message),
+            Pm_MessageData1(buffer[0].message),
+            Pm_MessageData2(buffer[0].message));
+        }
+    }
+
+    err = Pm_Close(stream);
+    if (err != pmNoError) {
+        printf("Failed to close input: %s/n", Pm_GetErrorText(err));
+        return -1;
+    };
+
+
     
     // call after using PortMidi
     err = Pm_Terminate();
