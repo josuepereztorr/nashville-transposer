@@ -156,11 +156,7 @@ int main()
         // TODO - ADD ERROR HANDLING
         while (1)
         {
-            // check if
-            if (Pm_Poll(stream))
-            {
-                result = Pm_Read(stream, buffer, 1);
-            }
+            result = Pm_Read(stream, buffer, 1);
 
             if (result > 0)
             {
