@@ -21,15 +21,20 @@ int main() {
         Pm_Terminate();
         return -1;
     };
-    printf("%d MIDI divces found\n", num_of_devices);
+    // printf("%d MIDI divces found\n", num_of_devices);
 
     /* pointer array, DO NOT STORE ACTUAL PmDeviceInfo STRUCTS! 
     let PortMidi handle this*/
     // TODO: add a const for MAX NUMBER OF DEVICES
-    const PmDeviceInfo *devices[50] = {0};
+    typedef struct  {
+        int id;
+        const PmDeviceInfo *device;
+    } MidiDevice;
+    // const PmDeviceInfo *devices[50] = {0};
+    MidiDevice devices[50] = {0};
 
     // Get the number of devices. By default, the computer has two, an input and an output.
-    printf("Devices available are: \n");
+    printf("Available devices: \n");
     for (int i = 0; i < num_of_devices; i++)
     {
         // Pm_GetDeviceInfo - takes an id as a parameter and returns a pointer to a PmDeviceInfo struct
@@ -42,31 +47,70 @@ int main() {
         }
 
         // add pointer to device array
-        devices[i] = device;
+        devices[i].id = i;
+        devices[i].device = device;
 
-        printf("%s ", device->name);
-        if (device->input != 1) {
-            printf("- OUTPUT\n");
-        } else {
-            printf("- INPUT\n");
-        }
+        // printf("%s ", device->name);
+        // if (device->input != 1) {
+        //     printf("- OUTPUT\n");
+        // } else {
+        //     printf("- INPUT\n");
+        // }
     };
 
     // print devices structs
-    printf("Size of Devices Array:");
+    // printf("Size of Devices Array:");
     const int size_of_device_array = sizeof(devices)/sizeof(devices[0]);
-    printf("%d\n", size_of_device_array);
-    printf("Pointers in Array:");
+    // printf("%d\n", size_of_device_array);
+    // printf("Pointers in Array:");
     int p_array_count = 0;
     for (int i = 0; i < size_of_device_array; i++)
     {
-        if (devices[i] != NULL) {
+        if (devices[i].device != NULL) {
             p_array_count++;
-            printf("%s\n", devices[i]->name);
+            printf("Id: %d\n", devices[i].id);
+            printf("Name: %s\n", devices[i].device->name);
+            if (devices[i].device->input != 1) {
+                printf("Type: Output\n\n");
+            } else {
+                printf("Type: Input\n\n");
+            }
         };
         continue;
     };
-    printf("%d\n", p_array_count);
+    // printf("%d\n", p_array_count);
+
+    // select a midi connection
+    printf("Select a midi device: ");
+    
+    int selected_id = -1;
+    int is_valid = 0;
+    while (!is_valid)
+    {
+        // ger user input
+        scanf("%d", &selected_id);
+
+        // iterate through the pointer array
+        for (int i = 0; i < size_of_device_array; i++)
+        {
+            // check if id is within bounds
+            if (selected_id < 0 || selected_id > size_of_device_array) {
+                printf("id is out of range");
+                break;
+            }
+
+            // check if the id provides a valid device.
+            if (devices[i].device != NULL) {
+                selected_id = i;
+                is_valid = 1;
+            }
+
+            continue;
+        }
+        
+        printf("you have selected %d\n", selected_id);
+
+    }
     
     // call after using PortMidi
     err = Pm_Terminate();

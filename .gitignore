@@ -1,0 +1,9 @@
+# debug symbols
+*.dSYM/
+
+# VS Code
+.vscode/
+
+# Compiled executables
+main
+nashville_transposer
