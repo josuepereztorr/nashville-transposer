@@ -66,7 +66,7 @@ int main() {
     int p_array_count = 0;
     for (int i = 0; i < size_of_device_array; i++)
     {
-        if (devices[i].device != NULL) {
+        if ((devices[i].device != NULL) && devices[i].device->input) {
             p_array_count++;
             printf("Id: %d\n", devices[i].id);
             printf("Name: %s\n", devices[i].device->name);
@@ -95,20 +95,23 @@ int main() {
         {
             // check if id is within bounds
             if (selected_id < 0 || selected_id > size_of_device_array) {
-                printf("id is out of range");
+                printf("id is out of range\n");
                 break;
             }
 
             // check if the id provides a valid device.
-            if (devices[i].device != NULL) {
-                selected_id = i;
-                is_valid = 1;
+            // check if the device is an input
+            if ((devices[i].device != NULL) && devices[i].device->input) {
+                // check if selected_id matches device id
+                if (devices[i].id == selected_id) {
+                    is_valid = 1;
+                    break;
+                }
+                continue;
             }
-
-            continue;
         }
         
-        printf("you have selected %d\n", selected_id);
+        printf("You have selected %d\n", selected_id);
 
     }
     
