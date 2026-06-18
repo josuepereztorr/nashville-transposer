@@ -2,6 +2,8 @@
 #include <string.h>
 #include <portmidi.h>
 
+#define MAX_DEVICES 50
+
 int main()
 {
     /* PortMidi is designed to support multiple interfaces (such as  ALSA, CoreMIDI and WinMM).
@@ -17,7 +19,6 @@ int main()
     printf("Initilization Complete\n");
 
     // See how many devices are connected. If id < 1, no devices found.
-    // int num_of_devices = Pm_CountDevices()-(Pm_CountDevices()-1);
     int num_of_devices = Pm_CountDevices();
     if (num_of_devices < 0)
     {
@@ -36,7 +37,7 @@ int main()
         const PmDeviceInfo *device;
     } MidiDevice;
     // const PmDeviceInfo *devices[50] = {0};
-    MidiDevice devices[50] = {0};
+    MidiDevice devices[MAX_DEVICES] = {0};
 
     // Get the number of devices. By default, the computer has two, an input and an output.
     printf("Available devices: \n");
@@ -55,17 +56,9 @@ int main()
         // add pointer to device array
         devices[i].id = i;
         devices[i].device = device;
-
-        // printf("%s ", device->name);
-        // if (device->input != 1) {
-        //     printf("- OUTPUT\n");
-        // } else {
-        //     printf("- INPUT\n");
-        // }
     };
 
     // print devices structs
-    // printf("Size of Devices Array:");
     const int size_of_device_array = sizeof(devices) / sizeof(devices[0]);
     printf("Size of array: %d\n", size_of_device_array);
     int p_array_count = 0;
@@ -79,9 +72,7 @@ int main()
             {
                 continue;
             }
-            // if (devices[i].device->name == "Network Josue's Macbook Session") {
-            //     continue;
-            // }
+
             p_array_count++;
             printf("Id: %d\n", devices[i].id);
             printf("Name: %s\n", devices[i].device->name);
@@ -96,7 +87,6 @@ int main()
         };
         continue;
     };
-    // printf("%d\n", p_array_count);
     printf("Pointers (non-null) in Array: %d\n", p_array_count);
 
     if (p_array_count > 0)
@@ -139,6 +129,7 @@ int main()
         }
 
         // open a connection to the selected midi device
+        // Pm_OpenInput requires: PortMidiStream, PmDeviceId, bufferSize
         PortMidiStream *stream = NULL;
         err = Pm_OpenInput(&stream, selected_id, NULL, 512, NULL, NULL);
         if (err != pmNoError)
@@ -149,20 +140,30 @@ int main()
         };
 
         // PmEvent
-        PmEvent buffer[1];
+        PmEvent buffer[300];
         int result;
 
         // loop while waiting for data
         // TODO - ADD ERROR HANDLING
         while (1)
         {
-            result = Pm_Read(stream, buffer, 1);
+            result = Pm_Read(stream, buffer, 300);
+
+            // raw bytes come back across multiple events
+            for (int i = 0; i < result; i++)
+            {
+                printf("Raw: %x\n", buffer[i].message);
+            }
 
             if (result > 0)
             {
-                printf("Status: %d  Note: %d  Velocity: %d\n",
+                printf("Buffer Message: %d\n", buffer[0].message);
+                printf("Status: %d  Note: %d  Velocity: %d\n\n",
+                       // unpacks the status out of the 32-bit integer (4 bytes)
                        Pm_MessageStatus(buffer[0].message),
+                       // unpacks data 1 out of the 32-bit integer (4 bytes)
                        Pm_MessageData1(buffer[0].message),
+                       // unpacks data 1 out of the 32-bit integer (4 bytes)
                        Pm_MessageData2(buffer[0].message));
             }
         }
