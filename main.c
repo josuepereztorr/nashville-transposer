@@ -12,7 +12,7 @@ int main()
     PmError err = Pm_Initialize();
     if (err != pmNoError)
     {
-        printf("Failed to initialize PortMidi: %s/n", Pm_GetErrorText(err));
+        printf("Failed to initialize PortMidi: %s\n", Pm_GetErrorText(err));
         Pm_Terminate();
         return -1;
     };
@@ -22,7 +22,7 @@ int main()
     int num_of_devices = Pm_CountDevices();
     if (num_of_devices < 0)
     {
-        printf("No MIDI devices found");
+        printf("No MIDI devices found\n");
         Pm_Terminate();
         return -1;
     };
@@ -125,7 +125,7 @@ int main()
                 }
             }
 
-            printf("You have selected %d\n", selected_id);
+            printf("You have selected %d\n\n", selected_id);
         }
 
         // open a connection to the selected midi device
@@ -134,44 +134,58 @@ int main()
         err = Pm_OpenInput(&stream, selected_id, NULL, 512, NULL, NULL);
         if (err != pmNoError)
         {
-            printf("Failed to initialize PortMidi: %s/n", Pm_GetErrorText(err));
+            printf("Failed to initialize PortMidi: %s\n", Pm_GetErrorText(err));
             Pm_Terminate();
             return -1;
         };
 
         // PmEvent
-        PmEvent buffer[300];
+        PmEvent buffer[1];
         int result;
 
         // loop while waiting for data
         // TODO - ADD ERROR HANDLING
         while (1)
         {
-            result = Pm_Read(stream, buffer, 300);
+            result = Pm_Read(stream, buffer, 1);
+
+            // if no midi messages are detected loop again
+            if (result == 0)
+            {
+                continue;
+            }
+
+            if (result < 0)
+            {
+                printf("Failed to read data: %s\n", Pm_GetErrorText(result));
+                err = Pm_Close(stream);
+                if (err != pmNoError)
+                {
+                    printf("Failed to close input: %s\n", Pm_GetErrorText(err));
+                    return -1;
+                };
+                Pm_Terminate();
+                return -1;
+            }
 
             // raw bytes come back across multiple events
-            for (int i = 0; i < result; i++)
-            {
-                printf("Raw: %x\n", buffer[i].message);
-            }
+            // printf("%d", result);
+            printf("32-Bit Message: %x\n", buffer[0].message);
 
-            if (result > 0)
-            {
-                printf("Buffer Message: %d\n", buffer[0].message);
-                printf("Status: %d  Note: %d  Velocity: %d\n\n",
-                       // unpacks the status out of the 32-bit integer (4 bytes)
-                       Pm_MessageStatus(buffer[0].message),
-                       // unpacks data 1 out of the 32-bit integer (4 bytes)
-                       Pm_MessageData1(buffer[0].message),
-                       // unpacks data 1 out of the 32-bit integer (4 bytes)
-                       Pm_MessageData2(buffer[0].message));
-            }
+            printf("Buffer Message: %d\n", buffer[0].message);
+            printf("Status: %d  Note: %d  Velocity: %d\n\n",
+                   // unpacks the status out of the 32-bit integer (4 bytes)
+                   Pm_MessageStatus(buffer[0].message),
+                   // unpacks data 1 out of the 32-bit integer (4 bytes)
+                   Pm_MessageData1(buffer[0].message),
+                   // unpacks data 1 out of the 32-bit integer (4 bytes)
+                   Pm_MessageData2(buffer[0].message));
         }
 
         err = Pm_Close(stream);
         if (err != pmNoError)
         {
-            printf("Failed to close input: %s/n", Pm_GetErrorText(err));
+            printf("Failed to close input: %s\n", Pm_GetErrorText(err));
             return -1;
         };
     }
@@ -184,7 +198,7 @@ int main()
     err = Pm_Terminate();
     if (err != pmNoError)
     {
-        printf("Failed to terminate PortMidi: %s/n", Pm_GetErrorText(err));
+        printf("Failed to terminate PortMidi: %s\n", Pm_GetErrorText(err));
         return -1;
     };
     printf("Termination Complete\n");
