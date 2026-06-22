@@ -16,6 +16,7 @@ static int device_count = 0;
 // Represents an open midi connection to the selected midi device
 static PortMidiStream *stream = NULL;
 
+// Adds PmDeviceInfo structs to devices[], filtered by input devices.
 static void add_devices(int tolal_num_of_devices)
 {
     for (int i = 0; i < tolal_num_of_devices; i++)
@@ -40,6 +41,7 @@ static void add_devices(int tolal_num_of_devices)
     }
 }
 
+// Prints to the console a list of devices with their id, name, and type
 void print_devices()
 {
     // print devices structs
@@ -61,6 +63,7 @@ void print_devices()
     };
 }
 
+// Prints to the console and asks the user for an id. Returns an id.
 static int select_device()
 {
     // select a midi connection
@@ -112,6 +115,7 @@ static void print_buffer(PmEvent buffer[])
            Pm_MessageData2(buffer[0].message));
 }
 
+// Reads a continuous input of PmEvents.
 PmError read_events()
 {
 
@@ -158,7 +162,6 @@ PmError midi_start()
         return pmNoDevice;
     };
 
-    // add all inputs devices to devices[]
     add_devices(tolal_num_of_devices);
 
     print_devices();

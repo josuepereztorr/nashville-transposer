@@ -4,7 +4,6 @@
 int main()
 {
     midi_start();
-
     return 0;
 };
 
