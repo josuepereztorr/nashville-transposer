@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX_NUM_OF_NOTES 128
 #define MAX_BUFFER_LINE_LENGTH 50
@@ -8,7 +9,7 @@ typedef struct
 {
     int status;
     int note;
-    char name[2];
+    char *name;
     int octave;
 } Note;
 
@@ -19,6 +20,7 @@ void create_keyboard()
 {
 }
 
+//  Removes csv control characters ('\n' and/or '\r') from the provided char[]
 void truncate_control_char(char string[])
 {
     size_t length = strlen(string);
@@ -41,13 +43,14 @@ void truncate_control_char(char string[])
     }
 }
 
+// Prints all the ASCII decimal values from char[]
 void get_dec_ancii(char string[])
 {
     printf("ASCII DEC Values (before): ");
 
     for (int i = 0; string[i] != '\0'; i++)
     {
-        printf("%d ", (unsigned char)string[i]);
+        printf("%d ", string[i]);
     }
 
     printf("\n");
@@ -66,11 +69,52 @@ void get_dec_ancii(char string[])
     printf("\n");
 }
 
-// come up with 3 tests for midi_note, note_name, and octave
+// Comparison tests
 void test_str_comp(char string1, char string2)
 {
     // char *str1 = "100";
     // printf("Equal: %d\n\n", strcmp(midi_note, str1));
+}
+
+// Tokenizes and parses the provided char[]
+int line_parser(char string[])
+{
+    Note note;
+
+    // String Tokenizer
+    char *midi_note = strtok(string, ",");
+
+    if (midi_note == NULL)
+    {
+        // handle EOF or error
+        return -1;
+    }
+
+    truncate_control_char(midi_note);
+    note.note = atof(midi_note);
+
+    char *note_name = strtok(NULL, ",");
+    if (note_name == NULL)
+    {
+        // handle EOF or error
+        return -1;
+    }
+
+    truncate_control_char(note_name);
+    note.name = note_name;
+
+    char *octave = strtok(NULL, ",");
+    if (octave == NULL)
+    {
+        // handle EOF or error
+        return -1;
+    }
+
+    truncate_control_char(octave);
+    note.octave = atof(octave);
+
+    printf("Note Struct: %i, %s, %i\n", note.note, note.name, note.octave);
+    return 0;
 }
 
 // Reads the midi_notes.csv file
@@ -97,37 +141,7 @@ int read_cvs()
     // returns a pointer to the buffer or NULL if an error occurs or if the End of File (EOF) has reached.
     while (fgets(buffer, sizeof(buffer), file) != NULL)
     {
-        // String Tokenizer and Parser
-        char *midi_note = strtok(buffer, ",");
-
-        if (midi_note == NULL)
-        {
-            // handle EOF or error
-            return -1;
-        }
-
-        truncate_control_char(midi_note);
-        printf("Note: %s\n", midi_note);
-
-        char *note_name = strtok(NULL, ",");
-        if (note_name == NULL)
-        {
-            // handle EOF or error
-            return -1;
-        }
-
-        truncate_control_char(note_name);
-        printf("Name: %s\n", note_name);
-
-        char *octave = strtok(NULL, ",");
-        if (octave == NULL)
-        {
-            // handle EOF or error
-            return -1;
-        }
-
-        truncate_control_char(octave);
-        printf("Octave: %s\n\n", octave);
+        line_parser(buffer);
     }
 
     fclose(file);
