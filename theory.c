@@ -113,7 +113,10 @@ int line_parser(char string[])
     truncate_control_char(octave);
     note.octave = atof(octave);
 
-    printf("Note Struct: %i, %s, %i\n", note.note, note.name, note.octave);
+    // set note.status to off
+    note.status = 0;
+
+    printf("Note Struct: %i, %i, %s, %i\n", note.status, note.note, note.name, note.octave);
     return 0;
 }
 
@@ -136,6 +139,12 @@ int read_cvs()
        "\r" carriage return
        "\0" null character */
     char buffer[MAX_BUFFER_LINE_LENGTH] = {0};
+
+    // reads the header and discards it.
+    while (fgets(buffer, sizeof(buffer), file) != NULL)
+    {
+        break;
+    }
 
     // buffer - is used to hold temporary data (one line from csv)
     // returns a pointer to the buffer or NULL if an error occurs or if the End of File (EOF) has reached.
