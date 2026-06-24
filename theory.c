@@ -19,6 +19,60 @@ void create_keyboard()
 {
 }
 
+void truncate_control_char(char string[])
+{
+    size_t length = strlen(string);
+
+    for (int i = 0; i < length; i++)
+    {
+        // removing control characters which could be "\r\n" or '\n'
+        // "\n" line feed
+        // "\r" carriage return
+        if (string[i] == '\r' && string[i + 1] == '\n')
+        {
+            string[i] = '\0';
+            break;
+        }
+
+        if (string[i] == '\n')
+        {
+            string[i] = '\0';
+        }
+    }
+}
+
+void get_dec_ancii(char string[])
+{
+    printf("ASCII DEC Values (before): ");
+
+    for (int i = 0; string[i] != '\0'; i++)
+    {
+        printf("%d ", (unsigned char)string[i]);
+    }
+
+    printf("\n");
+
+    truncate_control_char(string);
+
+    printf("ASCII DEC Values (after): ");
+
+    // prints the decimal equivalent of all characters in the array, except '\0'
+    for (int i = 0; string[i] != '\0'; i++)
+    {
+        // printf("%d ", (unsigned char)string[i]);
+        printf("%d ", string[i]);
+    }
+
+    printf("\n");
+}
+
+// come up with 3 tests for midi_note, note_name, and octave
+void test_str_comp(char string1, char string2)
+{
+    // char *str1 = "100";
+    // printf("Equal: %d\n\n", strcmp(midi_note, str1));
+}
+
 // Reads the midi_notes.csv file
 int read_cvs()
 {
@@ -43,13 +97,38 @@ int read_cvs()
     // returns a pointer to the buffer or NULL if an error occurs or if the End of File (EOF) has reached.
     while (fgets(buffer, sizeof(buffer), file) != NULL)
     {
-        // what to do with the data
-        // parse data by removing the control characters
-        char *data = strtok(buffer, ",");
-        printf("Note: %s\n", data);
-    }
+        // String Tokenizer and Parser
+        char *midi_note = strtok(buffer, ",");
 
-    // NULL case
+        if (midi_note == NULL)
+        {
+            // handle EOF or error
+            return -1;
+        }
+
+        truncate_control_char(midi_note);
+        printf("Note: %s\n", midi_note);
+
+        char *note_name = strtok(NULL, ",");
+        if (note_name == NULL)
+        {
+            // handle EOF or error
+            return -1;
+        }
+
+        truncate_control_char(note_name);
+        printf("Name: %s\n", note_name);
+
+        char *octave = strtok(NULL, ",");
+        if (octave == NULL)
+        {
+            // handle EOF or error
+            return -1;
+        }
+
+        truncate_control_char(octave);
+        printf("Octave: %s\n\n", octave);
+    }
 
     fclose(file);
     return 0;
