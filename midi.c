@@ -10,14 +10,21 @@ typedef struct
 } MidiDevice;
 
 // stores all devies (inputs/outputs)
-static MidiDevice devices[MAX_DEVICES] = {0};
-static int device_count = 0;
+MidiDevice devices[MAX_DEVICES] = {0};
+int device_count = 0;
 
 // Represents an open midi connection to the selected midi device
-static PortMidiStream *stream = NULL;
+PortMidiStream *stream = NULL;
+
+PmError midi_start();
+PmError read_events();
+int select_device();
+void add_devices(int tolal_num_of_devices);
+void print_buffer(PmEvent buffer[]);
+void print_devices();
 
 // Adds PmDeviceInfo structs to devices[], filtered by input devices.
-static void add_devices(int tolal_num_of_devices)
+void add_devices(int tolal_num_of_devices)
 {
     for (int i = 0; i < tolal_num_of_devices; i++)
     {
@@ -41,30 +48,8 @@ static void add_devices(int tolal_num_of_devices)
     }
 }
 
-// Prints to the console a list of devices with their id, name, and type
-void print_devices()
-{
-    // print devices structs
-    printf("Avilable Devices: \n");
-
-    for (int i = 0; i < device_count; i++)
-    {
-        printf("Id: %d\n", devices[i].id);
-        printf("Name: %s\n", devices[i].device_info->name);
-
-        if (devices[i].device_info->input != 1)
-        {
-            printf("Type: Output\n\n");
-            continue;
-        }
-
-        printf("Type: Input\n\n");
-        continue;
-    };
-}
-
 // Prints to the console and asks the user for an id. Returns an id.
-static int select_device()
+int select_device()
 {
     // select a midi connection
     printf("Select a midi device: ");
@@ -98,21 +83,6 @@ static int select_device()
     }
     printf("You have selected %d\n\n", selected_id);
     return selected_id;
-}
-
-static void print_buffer(PmEvent buffer[])
-{
-    // raw bytes come back across multiple events
-    printf("32-Bit Message: %x\n", buffer[0].message);
-
-    // extracted 3-byte midi message (status, data1, data2)
-    printf("Status: %d  Note: %d  Velocity: %d\n\n",
-           // unpacks the status out of the 32-bit integer (4 bytes)
-           Pm_MessageStatus(buffer[0].message),
-           // unpacks data 1 out of the 32-bit integer (4 bytes)
-           Pm_MessageData1(buffer[0].message),
-           // unpacks data 1 out of the 32-bit integer (4 bytes)
-           Pm_MessageData2(buffer[0].message));
 }
 
 // Reads a continuous input of PmEvents.
@@ -194,4 +164,41 @@ PmError midi_start()
     }
 
     return pmNoError;
+}
+
+// Prints to the console a list of devices with their id, name, and type
+void print_devices()
+{
+    // print devices structs
+    printf("Avilable Devices: \n");
+
+    for (int i = 0; i < device_count; i++)
+    {
+        printf("Id: %d\n", devices[i].id);
+        printf("Name: %s\n", devices[i].device_info->name);
+
+        if (devices[i].device_info->input != 1)
+        {
+            printf("Type: Output\n\n");
+            continue;
+        }
+
+        printf("Type: Input\n\n");
+        continue;
+    };
+}
+
+void print_buffer(PmEvent buffer[])
+{
+    // raw bytes come back across multiple events
+    printf("32-Bit Message: %x\n", buffer[0].message);
+
+    // extracted 3-byte midi message (status, data1, data2)
+    printf("Status: %d  Note: %d  Velocity: %d\n\n",
+           // unpacks the status out of the 32-bit integer (4 bytes)
+           Pm_MessageStatus(buffer[0].message),
+           // unpacks data 1 out of the 32-bit integer (4 bytes)
+           Pm_MessageData1(buffer[0].message),
+           // unpacks data 1 out of the 32-bit integer (4 bytes)
+           Pm_MessageData2(buffer[0].message));
 }

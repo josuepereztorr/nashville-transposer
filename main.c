@@ -1,11 +1,8 @@
-#include <stdio.h>
 #include "midi.c"
-#include "theory.c"
 
 int main()
 {
-    // midi_start();
-    read_cvs();
+    midi_start();
     return 0;
 };
 
