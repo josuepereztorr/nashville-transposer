@@ -9,7 +9,7 @@ typedef struct
 {
     int status;
     int note;
-    char *name;
+    char name[10];
     int octave;
 } Note;
 
@@ -69,15 +69,8 @@ void get_dec_ancii(char string[])
     printf("\n");
 }
 
-// Comparison tests
-void test_str_comp(char string1, char string2)
-{
-    // char *str1 = "100";
-    // printf("Equal: %d\n\n", strcmp(midi_note, str1));
-}
-
 // Tokenizes and parses the provided char[]
-int line_parser(char string[])
+int line_parser(char string[], int counter)
 {
     Note note;
 
@@ -101,7 +94,11 @@ int line_parser(char string[])
     }
 
     truncate_control_char(note_name);
-    note.name = note_name;
+    // doesn't work since it passes a pointer not the value.
+    // note.name = note_name;
+
+    // have to pass a copy of the value at *note_name
+    strcpy(note.name, note_name);
 
     char *octave = strtok(NULL, ",");
     if (octave == NULL)
@@ -115,8 +112,14 @@ int line_parser(char string[])
 
     // set note.status to off
     note.status = 0;
+    // printf("%d\n", counter);
+    //  add to keyboard array
+    if (counter < MAX_NUM_OF_NOTES)
+    {
+        keyboard[counter] = note;
+    }
 
-    printf("Note Struct: %i, %i, %s, %i\n", note.status, note.note, note.name, note.octave);
+    // printf("Note Struct: %i, %i, %s, %i\n\n", note.status, note.note, note.name, note.octave);
     return 0;
 }
 
@@ -146,12 +149,22 @@ int read_cvs()
         break;
     }
 
+    //
+    int counter = 0;
+
     // buffer - is used to hold temporary data (one line from csv)
     // returns a pointer to the buffer or NULL if an error occurs or if the End of File (EOF) has reached.
     while (fgets(buffer, sizeof(buffer), file) != NULL)
     {
-        line_parser(buffer);
+
+        line_parser(buffer, counter);
+        counter++;
     }
+
+    // for (int i = 0; i < MAX_NUM_OF_NOTES; i++)
+    // {
+    //     printf("Note Struct: %i, %i, %s, %i\n", keyboard[i].status, keyboard[i].note, keyboard[i].name, keyboard[i].octave);
+    // }
 
     fclose(file);
     return 0;
