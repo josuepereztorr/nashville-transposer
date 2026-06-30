@@ -1,8 +1,21 @@
-#include "midi.c"
+#include "csv_parser.h"
+#include "theory.h"
 
 int main()
 {
-    midi_start();
+    // read csv file
+    char rows[CSV_MAX_ROWS][CSV_MAX_BUFFER_SIZE] = {};
+    int rows_read = csv_read("midi_notes.csv", rows);
+
+    // parse data and verify keyboard array is successfuly filled
+    for (int row = 0; row < rows_read; row++)
+    {
+        th_line_parser(rows[row]);
+    }
+    print_keyboard();
+
+    // start midi detection
+
     return 0;
 };
 

@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include "utility.h"
 
-void get_dec_ancii(char string[]);
-void truncate_control_char(char string[]);
-
-//  Removes OS specifc control characters ('\r\n' or '\n') from the provided string[]
 void truncate_control_char(char string[])
 {
     size_t length = strlen(string);
@@ -28,7 +25,6 @@ void truncate_control_char(char string[])
     }
 }
 
-// Prints all ASCII decimal values from string[]. The function does truncate (LN and CR) special control characters.
 void get_dec_ancii(char string[])
 {
     printf("ASCII DEC Values (before): ");
