@@ -1,18 +1,26 @@
-#include "csv_parser/csv_parser.h"
+#include <stdio.h>
+#include "csv_reader/csv_reader.h"
 #include "theory/theory.h"
+
+#define CSV_DATA_PATH "./data/midi_notes.csv"
 
 int main()
 {
-    // read csv file
+    // get data
     char rows[CSV_MAX_ROWS][CSV_MAX_BUFFER_SIZE] = {};
-    int rows_read = csv_read("./data/midi_notes.csv", rows);
+    int rows_read = csv_read(CSV_DATA_PATH, rows);
+
+    if (rows_read < 0)
+    {
+        printf("main: failed to load data from '%s'\n", CSV_DATA_PATH);
+        return 1;
+    }
 
     // parse data and verify keyboard array is successfuly filled
     for (int row = 0; row < rows_read; row++)
     {
         th_line_parser(rows[row]);
     }
-    print_keyboard();
 
     // start midi detection
 
