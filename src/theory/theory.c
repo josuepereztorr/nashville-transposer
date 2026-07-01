@@ -21,7 +21,7 @@ int line_counter = 0;
 
 static void print_note(Note note);
 
-int th_line_parser(char string[])
+int thry_row_parser(char string[])
 {
     Note note = {0};
 

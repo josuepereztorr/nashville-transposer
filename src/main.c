@@ -6,7 +6,7 @@
 
 int main()
 {
-    // get data
+    // get data from csv
     char rows[CSV_MAX_ROWS][CSV_MAX_BUFFER_SIZE] = {};
     int rows_read = csv_read(CSV_DATA_PATH, rows);
 
@@ -16,10 +16,10 @@ int main()
         return 1;
     }
 
-    // parse data and verify keyboard array is successfuly filled
+    // parse and load data
     for (int row = 0; row < rows_read; row++)
     {
-        th_line_parser(rows[row]);
+        thry_row_parser(rows[row]);
     }
 
     // start midi detection

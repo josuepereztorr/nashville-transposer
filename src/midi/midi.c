@@ -9,47 +9,120 @@ typedef struct
     const PmDeviceInfo *device_info;
 } MidiDevice;
 
-// stores all devies (inputs/outputs)
+// stores all devices (inputs and outputs)
 MidiDevice devices[MAX_DEVICES] = {0};
-int device_count = 0;
-
 // Represents an open midi connection to the selected midi device
 PortMidiStream *stream = NULL;
+int device_count = 0;
 
-PmError midi_start();
-PmError read_events();
-int select_device();
-void add_devices(int tolal_num_of_devices);
-void print_buffer(PmEvent buffer[]);
-void print_devices();
+static void add_devices(int num_of_devices);
+static int select_device();
+static void print_buffer(PmEvent buffer[]);
+static void print_devices();
+
+PmError midi_start()
+{
+    /* PortMidi is designed to support multiple interfaces (such as  ALSA, CoreMIDI and WinMM).
+    It is possible to return pmNoError because there are no supported interfaces. In that case,
+    zero devices will be available.*/
+    PmError error = Pm_Initialize();
+
+    if (error != pmNoError)
+    {
+        return error;
+    };
+
+    printf("midi: init successfull");
+
+    // total number of devices (virtual/hardwired)
+    int num_of_devices = Pm_CountDevices();
+
+    if (num_of_devices < 0)
+    {
+        return pmNoDevice;
+    };
+
+    printf("midi: %i midi devices found", num_of_devices);
+
+    add_devices(num_of_devices);
+
+    // only valid for terminal application
+    int selected_id = select_device();
+
+    // Pm_OpenInput requires: PortMidiStream, PmDeviceId, bufferSize
+    error = Pm_OpenInput(&stream, selected_id, NULL, 512, NULL, NULL);
+
+    if (error != pmNoError)
+    {
+        return error;
+    };
+
+    // PmEvent
+    PmEvent buffer[1] = {};
+
+    // loop while waiting for data
+    // TODO - find a way to end this loop
+    while (1)
+    {
+        // returns the number of PmEvents read
+        int num_of_events = Pm_Read(stream, buffer, 1);
+
+        if (num_of_events < 0)
+        {
+            // PmError value will be returned
+            return num_of_events;
+        }
+
+        if (num_of_events > 0)
+        {
+            print_buffer(buffer);
+        }
+    }
+
+    error = Pm_Close(stream);
+
+    if (error != pmNoError)
+    {
+        return error;
+    };
+
+    error = Pm_Terminate();
+
+    // If Pm_Terminate fails, the program will just end
+    if (error != pmNoError)
+    {
+        return error;
+    }
+
+    return pmNoError;
+}
 
 // Adds PmDeviceInfo structs to devices[], filtered by input devices.
-void add_devices(int tolal_num_of_devices)
+static void add_devices(int num_of_devices)
 {
-    for (int i = 0; i < tolal_num_of_devices; i++)
+    for (int device = 0; device < num_of_devices; device++)
     {
         // Pm_GetDeviceInfo - takes an id as a parameter and returns a pointer to a PmDeviceInfo struct
-        const PmDeviceInfo *device_info = Pm_GetDeviceInfo(i);
+        const PmDeviceInfo *device_info = Pm_GetDeviceInfo(device);
 
         // if id is out of range or if the device designates a deleted virtual device, the function returns NULL.
-        // only store midi inputs
         if (device_info == NULL)
         {
             continue;
         }
 
-        if (device_info->output != 1)
+        if (device_info->input)
         {
             // add to MidiDevice array
-            devices[i].id = i;
-            devices[i].device_info = device_info;
+            devices[device].id = device;
+            devices[device].device_info = device_info;
             device_count++;
         }
     }
 }
 
 // Prints to the console and asks the user for an id. Returns an id.
-int select_device()
+static int select_device()
 {
     // select a midi connection
     printf("Select a midi device: ");
@@ -85,89 +158,8 @@ int select_device()
     return selected_id;
 }
 
-// Reads a continuous input of PmEvents.
-PmError read_events()
-{
-
-    // PmEvent
-    PmEvent buffer[1];
-
-    // loop while waiting for data
-    // TODO - find a way to end this loop
-    while (1)
-    {
-        // returns the number of PmEvents read
-        int num_of_events = Pm_Read(stream, buffer, 1);
-
-        if (num_of_events < 0)
-        {
-            // PmError value will be returned
-            return num_of_events;
-        }
-
-        if (num_of_events > 0)
-        {
-            print_buffer(buffer);
-        }
-    }
-}
-
-PmError midi_start()
-{
-    /* PortMidi is designed to support multiple interfaces (such as  ALSA, CoreMIDI and WinMM).
-    It is possible to return pmNoError because there are no supported interfaces. In that case,
-    zero devices will be available.*/
-    PmError error = Pm_Initialize();
-
-    if (error != pmNoError)
-    {
-        return error;
-    };
-
-    // total number of devices (virtual/hardwired)
-    int tolal_num_of_devices = Pm_CountDevices();
-
-    if (tolal_num_of_devices < 0)
-    {
-        return pmNoDevice;
-    };
-
-    add_devices(tolal_num_of_devices);
-
-    print_devices();
-
-    int selected_id = select_device();
-
-    // Pm_OpenInput requires: PortMidiStream, PmDeviceId, bufferSize
-    error = Pm_OpenInput(&stream, selected_id, NULL, 512, NULL, NULL);
-
-    if (error != pmNoError)
-    {
-        return error;
-    };
-
-    read_events();
-
-    error = Pm_Close(stream);
-
-    if (error != pmNoError)
-    {
-        return error;
-    };
-
-    error = Pm_Terminate();
-
-    // If Pm_Terminate fails, the program will just end
-    if (error != pmNoError)
-    {
-        return error;
-    }
-
-    return pmNoError;
-}
-
 // Prints to the console a list of devices with their id, name, and type
-void print_devices()
+static void print_devices()
 {
     // print devices structs
     printf("Avilable Devices: \n");
@@ -177,18 +169,18 @@ void print_devices()
         printf("Id: %d\n", devices[i].id);
         printf("Name: %s\n", devices[i].device_info->name);
 
-        if (devices[i].device_info->input != 1)
+        if (devices[i].device_info->input)
         {
-            printf("Type: Output\n\n");
+            printf("Type: Input\n\n");
             continue;
         }
 
-        printf("Type: Input\n\n");
+        printf("Type: Output\n\n");
         continue;
     };
 }
 
-void print_buffer(PmEvent buffer[])
+static void print_buffer(PmEvent buffer[])
 {
     // raw bytes come back across multiple events
     printf("32-Bit Message: %x\n", buffer[0].message);
