@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <portmidi.h>
+#include "../midi/midi.h"
 
 #define MAX_DEVICES 10
 
@@ -32,7 +32,7 @@ PmError midi_start()
         return error;
     };
 
-    printf("midi: init successfull");
+    printf("midi: init successful\n");
 
     // total number of devices (virtual/hardwired)
     int num_of_devices = Pm_CountDevices();
@@ -42,7 +42,7 @@ PmError midi_start()
         return pmNoDevice;
     };
 
-    printf("midi: %i midi devices found", num_of_devices);
+    printf("midi: %i midi devices found\n", num_of_devices);
 
     add_devices(num_of_devices);
 
