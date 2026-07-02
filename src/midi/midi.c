@@ -2,6 +2,7 @@
 #include "../midi/midi.h"
 
 #define MAX_DEVICES 10
+#define MAX_BUFFERED_EVENTS 512
 
 typedef struct
 {
@@ -20,66 +21,33 @@ static int select_device();
 static void print_buffer(PmEvent buffer[]);
 static void print_devices();
 
-PmError midi_start()
+int midi_initialize()
 {
     /* PortMidi is designed to support multiple interfaces (such as  ALSA, CoreMIDI and WinMM).
     It is possible to return pmNoError because there are no supported interfaces. In that case,
     zero devices will be available.*/
     PmError error = Pm_Initialize();
 
-    if (error != pmNoError)
-    {
-        return error;
-    };
-
-    printf("midi: init successful\n");
+    printf("midi_initialize: init successful\n");
 
     // total number of devices (virtual/hardwired)
     int num_of_devices = Pm_CountDevices();
 
-    if (num_of_devices < 0)
+    if (num_of_devices == 0)
     {
-        return pmNoDevice;
-    };
+        return 0;
+    }
 
-    printf("midi: %i midi devices found\n", num_of_devices);
+    printf("midi_initialize: %i midi devices found\n", num_of_devices);
 
     add_devices(num_of_devices);
 
-    // only valid for terminal application
-    int selected_id = select_device();
+    return num_of_devices;
+}
 
-    // Pm_OpenInput requires: PortMidiStream, PmDeviceId, bufferSize
-    error = Pm_OpenInput(&stream, selected_id, NULL, 512, NULL, NULL);
-
-    if (error != pmNoError)
-    {
-        return error;
-    };
-
-    // PmEvent
-    PmEvent buffer[1] = {};
-
-    // loop while waiting for data
-    // TODO - find a way to end this loop
-    while (1)
-    {
-        // returns the number of PmEvents read
-        int num_of_events = Pm_Read(stream, buffer, 1);
-
-        if (num_of_events < 0)
-        {
-            // PmError value will be returned
-            return num_of_events;
-        }
-
-        if (num_of_events > 0)
-        {
-            print_buffer(buffer);
-        }
-    }
-
-    error = Pm_Close(stream);
+PmError midi_terminate()
+{
+    PmError error = Pm_Close(stream);
 
     if (error != pmNoError)
     {
@@ -88,10 +56,67 @@ PmError midi_start()
 
     error = Pm_Terminate();
 
-    // If Pm_Terminate fails, the program will just end
     if (error != pmNoError)
     {
         return error;
+    }
+
+    return pmNoError;
+}
+
+PmError midi_connect_device()
+{
+    // only valid for terminal application
+    int selected_id = select_device();
+
+    // Pm_OpenInput requires: PortMidiStream, PmDeviceId, bufferSize
+    PmError error = Pm_OpenInput(&stream, selected_id, NULL, MAX_BUFFERED_EVENTS, NULL, NULL);
+
+    if (error != pmNoError)
+    {
+        // connection to midi device failed
+        return error;
+    };
+
+    const PmDeviceInfo *selected_device = Pm_GetDeviceInfo(selected_id);
+
+    if (selected_device != NULL)
+    {
+        printf("midi_connect_device: %s connection opened to '%s'\n", selected_device->input ? "INPUT" : "OUTPUT", selected_device->name);
+    }
+    else
+    {
+        fprintf(stderr, "Pm_GetDeviceInfo is NULL: pointer for selected_device is out of range or was deleted");
+    }
+
+    return pmNoError;
+}
+
+PmError midi_read(void (*external_function)())
+{
+    PmEvent event_buffer[1] = {};
+    int events_per_read = 1;
+
+    // TODO - Find a way to gracefully recover
+    while (1)
+    {
+        // returns the number of PmEvents read or a PmError
+        PmError error = Pm_Read(stream, event_buffer, events_per_read);
+
+        if (error < 0)
+        {
+            // PmError value will be returned
+            return error;
+        }
+
+        // UI, or other program logic
+        // update UI to show key pressed
+        // do logic to compare midi key
+
+        if (external_function != NULL)
+        {
+            external_function();
+        }
     }
 
     return pmNoError;
@@ -138,7 +163,7 @@ static int select_device()
         for (int i = 0; i < device_count; i++)
         {
             // check if id is within bounds
-            // TODO - find better fultering method
+            // TODO - find better filtering method
             if (selected_id < 0 || selected_id > device_count)
             {
                 printf("id is out of range\n");
@@ -154,7 +179,7 @@ static int select_device()
             continue;
         }
     }
-    printf("You have selected %d\n\n", selected_id);
+    // printf("You have selected %d\n", selected_id);
     return selected_id;
 }
 
@@ -180,6 +205,7 @@ static void print_devices()
     };
 }
 
+// Prints a the raw MIDI message as well as the unpacked Message, data1, and data2.
 static void print_buffer(PmEvent buffer[])
 {
     // raw bytes come back across multiple events

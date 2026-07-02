@@ -2,7 +2,7 @@
 #include <string.h>
 #include "utility.h"
 
-void truncate_control_char(char string[])
+void util_truncate_control_char(char string[])
 {
     size_t length = strlen(string);
 
@@ -25,7 +25,7 @@ void truncate_control_char(char string[])
     }
 }
 
-void get_dec_ancii(char string[])
+void util_get_dec_ancii(char string[])
 {
     printf("ASCII DEC Values (before): ");
 
@@ -37,7 +37,7 @@ void get_dec_ancii(char string[])
 
     printf("\n");
 
-    truncate_control_char(string);
+    util_truncate_control_char(string);
 
     printf("ASCII DEC Values (after): ");
 

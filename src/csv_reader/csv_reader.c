@@ -31,6 +31,7 @@ int csv_read(char filename[], char rows[][CSV_MAX_BUFFER_SIZE])
     // reads the header and discards it.
     while (fgets(rows[counter], CSV_MAX_BUFFER_SIZE, file) == NULL)
     {
+        // ferror() - flag inside File struct to mark if their is an error.
         if (ferror(file))
         {
             printf("csv_reader: error discarding the header row\n");

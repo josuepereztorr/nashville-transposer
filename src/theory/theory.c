@@ -21,8 +21,21 @@ int line_counter = 0;
 
 static void print_note(Note note);
 
-int thry_row_parser(char string[])
+int theory_row_parser(char string[])
 {
+    if (string == NULL)
+    {
+        fprintf(stderr, "theory_row_parser: string is NULL\n");
+        return -1;
+    }
+
+    // empty string
+    if (string[0] == '\0')
+    {
+        fprintf(stderr, "string is empty\n");
+        return -1;
+    }
+
     Note note = {0};
 
     // String Tokenizer
@@ -34,7 +47,7 @@ int thry_row_parser(char string[])
         return -1;
     }
 
-    truncate_control_char(midi_note);
+    util_truncate_control_char(midi_note);
     note.note = atof(midi_note);
 
     char *note_name = strtok(NULL, ",");
@@ -45,12 +58,9 @@ int thry_row_parser(char string[])
         return -1;
     }
 
-    truncate_control_char(note_name);
+    util_truncate_control_char(note_name);
 
-    // doesn't work since it passes a pointer not the value.
-    // note.name = note_name;
-
-    // have to pass a copy of the value at *note_name
+    // strcopy could overwrite past the destination source so I made the name[] larger.
     strcpy(note.name, note_name);
 
     char *octave = strtok(NULL, ",");
@@ -61,7 +71,7 @@ int thry_row_parser(char string[])
         return -1;
     }
 
-    truncate_control_char(octave);
+    util_truncate_control_char(octave);
     note.octave = atof(octave);
 
     note.status = 0;
@@ -75,7 +85,7 @@ int thry_row_parser(char string[])
     return 0;
 }
 
-void print_keyboard()
+void theory_print_keyboard()
 {
     for (int i = 0; i < MAX_NUM_OF_NOTES; i++)
     {
