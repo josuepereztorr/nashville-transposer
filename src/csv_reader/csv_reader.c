@@ -55,7 +55,7 @@ int csv_read(char filename[], char rows[][CSV_MAX_BUFFER_SIZE])
         return -1;
     }
 
-    printf("csv_reader: file read %i rows successfully\n", counter);
+    printf("csv_reader: read %i rows successfully\n", counter);
     fclose(file);
     return counter;
 }

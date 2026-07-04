@@ -2,6 +2,7 @@
 #include "csv_reader/csv_reader.h"
 #include "theory/theory.h"
 #include "midi/midi.h"
+#include "raylib.h"
 
 #define CSV_DATA_PATH "./data/midi_notes.csv"
 
@@ -9,6 +10,9 @@ void external();
 
 int main()
 {
+    // buffering set to unbuffered
+    setbuf(stdout, NULL);
+
     // get data from csv
     char rows[CSV_MAX_ROWS][CSV_MAX_BUFFER_SIZE] = {};
     int rows_read = csv_read(CSV_DATA_PATH, rows);
@@ -34,22 +38,21 @@ int main()
     // start portMidi and search for devices.
     int num_of_devices = midi_initialize();
 
-    // do i really want to end my program?
+    // do i really want to end my program? loop?
     if (num_of_devices == 0)
     {
         printf("main: no devices found\n");
         return 1;
     }
 
-    // Create a separate function that tries to connect to a selected midi device
+    // Connect to a MIDI device
     PmError error = midi_connect_device();
-
     if (error != pmNoError)
     {
         fprintf(stderr, "Pm_OpenInput failed: %d\n ", error);
     }
 
-    // create a separate function that tries to read from a selected midi device
+    // Read from MIDI Device
     error = midi_read(external);
 
     if (error != pmNoError)
@@ -64,13 +67,28 @@ int main()
         fprintf(stderr, "midi_terminate failed: %d\n ", error);
     }
 
+    // Start the UI
+    InitWindow(800, 450, "Nashville Transposer");
+
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+
+        // Clears the frame
+        ClearBackground(BLACK);
+
+        // other logic
+
+        EndDrawing();
+    }
+
+    CloseWindow();
     return 0;
 };
 
 // temp callback function
 void external()
 {
-
     // printf("inside of the external function\n");
 }
 
@@ -86,5 +104,8 @@ void external()
     - I would like the start function to handle
         1. Pm_Initialize() - Start PortMidi
         2. Pm_CountDevices() - How many devices are connected?
+
+    TODO
+    - Terminal color change
 
 */

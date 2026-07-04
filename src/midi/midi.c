@@ -86,9 +86,8 @@ PmError midi_connect_device()
     }
     else
     {
-        fprintf(stderr, "Pm_GetDeviceInfo is NULL: pointer for selected_device is out of range or was deleted");
+        fprintf(stderr, "Pm_GetDeviceInfo is NULL: pointer for selected_device is out of range or was deleted\n");
     }
-
     return pmNoError;
 }
 
@@ -97,9 +96,12 @@ PmError midi_read(void (*external_function)())
     PmEvent event_buffer[1] = {};
     int events_per_read = 1;
 
+    printf("midi_read: ready to read\n");
+
     // TODO - Find a way to gracefully recover
     while (1)
     {
+
         // returns the number of PmEvents read or a PmError
         PmError error = Pm_Read(stream, event_buffer, events_per_read);
 

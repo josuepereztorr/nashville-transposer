@@ -17,7 +17,9 @@ typedef struct
 
 // Stores the full range of notes (0-127) as Note structs.
 Note keyboard[MAX_NUM_OF_NOTES] = {0};
-int line_counter = 0;
+
+// Verifies rows read matches MAX_NUM_OF_NOTES.
+int row_counter = 0;
 
 static void print_note(Note note);
 
@@ -76,10 +78,10 @@ int theory_row_parser(char string[])
 
     note.status = 0;
 
-    if (line_counter < MAX_NUM_OF_NOTES)
+    if (row_counter < MAX_NUM_OF_NOTES)
     {
-        keyboard[line_counter] = note;
-        line_counter++;
+        keyboard[row_counter] = note;
+        row_counter++;
     }
 
     return 0;
