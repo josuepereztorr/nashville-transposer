@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "../ui/ui.h"
 
+#define UI_MAX_KEYS 25
+
 const Color background = {18, 20, 28, 255};
 const Color foreground = {27, 29, 40, 255};
 const Color border = {42, 45, 58, 255};
@@ -15,7 +17,14 @@ typedef struct
     int y_offset;
     int width;
     int height;
+    Color color;
 } UIElement;
+
+typedef struct
+{
+    UIElement element;
+    int is_pressed;
+} UINote;
 
 // num off keys
 int num_of_keys = 25;
@@ -37,34 +46,31 @@ void ui_create_keyboard()
     int bg_height = (GetScreenHeight() * 0.375) - 20;
     DrawRectangle(bg_x_offset, bg_y_offset, bg_width, bg_height, foreground);
 
-    create_white_note(bg_x_offset, bg_y_offset, bg_width, bg_height, primary_text, 0);
-    create_white_note(bg_x_offset, bg_y_offset, bg_width, bg_height, secondary_text, 1);
-    create_white_note(bg_x_offset, bg_y_offset, bg_width, bg_height, primary_text, 2);
-    // create_white_note(bg_x_offset, bg_y_offset, bg_width, bg_height, secondary_text, 3);
-    // create_white_note(bg_x_offset, bg_y_offset, bg_width, bg_height, primary_text, 4);
-    // create_white_note(bg_x_offset, bg_y_offset, bg_width, bg_height, secondary_text, 5);
-    // create_white_note(bg_x_offset, bg_y_offset, bg_width, bg_height, primary_text, 6);
+    for (int i = 0; i < num_of_keys; i++)
+    {
+        create_white_note(bg_x_offset, bg_y_offset, bg_width, bg_height, primary_text, i);
+    }
 
     // UI black key
 }
 
-void create_white_note(int x_offset, int y_offset, int width, int height, Color color, int multiplier)
+void create_white_note(int parent_x_offset, int parent_y_offset, int parent_width, int parent_height, Color color, int multiplier)
 {
-    int white_key_width = (width + (num_of_keys * 5)) / num_of_keys;
-    int white_key_height = height;
+    // space between keys
+    int key_padding = 2;
+    int total_key_padding = num_of_keys * key_padding;
+
+    int x_offset = parent_x_offset + multiplier;
+    int width = (parent_width - total_key_padding) / num_of_keys;
 
     if (multiplier > 0)
     {
-        // x_offset = (x_offset);
-        multiplier = (white_key_width * multiplier) + 5;
+        multiplier = (multiplier * width) + (multiplier * key_padding);
     }
-    x_offset += multiplier;
 
-    printf("x_offset: %i\n", x_offset);
-    printf("multiplier: %i\n", multiplier);
-    printf("white_key_width: %i\n\n", white_key_width);
+    x_offset = parent_x_offset + multiplier;
 
-    DrawRectangle(x_offset, y_offset, white_key_width, white_key_height, color);
+    DrawRectangle(x_offset, parent_y_offset, width, parent_height, color);
 }
 
 // top_margin is a value from 0.00 to 1.00
