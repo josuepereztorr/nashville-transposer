@@ -99,7 +99,7 @@ void external()
 }
 
 //  Terminal Build Commands
-//    clang src/main.c src/csv_reader/*.c src/theory/*.c src/utility/*.c src/midi/*.c -I/usr/local/include -L/usr/local/lib -lportmidi -o build/nashville_transposer
+//    clang -g src/main.c src/csv_reader/*.c src/theory/*.c src/utility/*.c src/midi/*.c src/ui/*.c -I/usr/local/include -L/usr/local/lib -lportmidi -lraylib -o build/nashville_transposer
 //    ./build/nashville_transposer
 /*
     Notes:
