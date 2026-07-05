@@ -2,9 +2,13 @@
 #include "csv_reader/csv_reader.h"
 #include "theory/theory.h"
 #include "midi/midi.h"
-#include "raylib.h"
+#include "ui/ui.h"
 
+// CSV
 #define CSV_DATA_PATH "./data/midi_notes.csv"
+
+// UI
+#define UI_NAME "Nashville Transposer"
 
 void external();
 
@@ -53,32 +57,34 @@ int main()
     }
 
     // Read from MIDI Device
-    error = midi_read(external);
+    // error = midi_read(external);
 
-    if (error != pmNoError)
-    {
-        fprintf(stderr, "midi_read failed: %d\n ", error);
-    }
+    // if (error != pmNoError)
+    // {
+    //     fprintf(stderr, "midi_read failed: %d\n ", error);
+    // }
 
-    error = midi_terminate();
+    // error = midi_terminate();
 
-    if (error != pmNoError)
-    {
-        fprintf(stderr, "midi_terminate failed: %d\n ", error);
-    }
+    // if (error != pmNoError)
+    // {
+    //     fprintf(stderr, "midi_terminate failed: %d\n ", error);
+    // }
 
     // Start the UI
-    InitWindow(800, 450, "Nashville Transposer");
+    InitWindow(GetScreenWidth(), GetScreenHeight(), UI_NAME);
+    ToggleFullscreen();
+    // ToggleFullscreen();
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
 
         // Clears the frame
-        ClearBackground(BLACK);
+        ClearBackground(background);
 
         // other logic
-
+        ui_create_keyboard();
         EndDrawing();
     }
 
