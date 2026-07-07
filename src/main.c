@@ -43,18 +43,18 @@ int main()
     int num_of_devices = midi_initialize();
 
     // do i really want to end my program? loop?
-    if (num_of_devices == 0)
-    {
-        printf("main: no devices found\n");
-        return 1;
-    }
+    // if (num_of_devices == 0)
+    // {
+    //     printf("main: no devices found\n");
+    //     return 1;
+    // }
 
-    // Connect to a MIDI device
-    PmError error = midi_connect_device();
-    if (error != pmNoError)
-    {
-        fprintf(stderr, "Pm_OpenInput failed: %d\n ", error);
-    }
+    // // Connect to a MIDI device
+    // PmError error = midi_connect_device();
+    // if (error != pmNoError)
+    // {
+    //     fprintf(stderr, "Pm_OpenInput failed: %d\n ", error);
+    // }
 
     // Read from MIDI Device
     // error = midi_read(external);
@@ -73,8 +73,8 @@ int main()
 
     // Start the UI
     InitWindow(GetScreenWidth(), GetScreenHeight(), UI_NAME);
-    ToggleFullscreen();
     // ToggleFullscreen();
+    //  ToggleFullscreen();
 
     while (!WindowShouldClose())
     {
