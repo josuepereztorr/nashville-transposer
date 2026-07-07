@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "../ui/ui.h"
 
-#define UI_MAX_KEYS 25
+#define UI_MAX_KEYS 24
 #define UI_SCREEN_WIDTH GetScreenWidth()
 #define UI_SCREEN_HEIGHT GetScreenHeight()
 
@@ -95,7 +95,7 @@ UIElement create_container(int x_offset, int screen_height, int screen_width, do
     el.x_offset = x_offset;
     el.y_offset = screen_height * height_ratio;
     el.width = screen_width - (el.x_offset * 2);
-    el.height = (screen_height * (1 - height_ratio)) - x_offset;
+    el.height = (screen_height * (1 - height_ratio)) - (el.x_offset * 2);
     DrawRectangle(el.x_offset, el.y_offset, el.width, el.height, success_midi);
     // printf("x_offset: %d\ny_offset: %d\nwidth: %d\nheight: %d\n", el.x_offset, el.y_offset, el.width, el.height);
     // printf("height_ratio: %f\n\n", height_ratio);
