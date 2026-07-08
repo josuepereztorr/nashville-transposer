@@ -12,8 +12,10 @@ typedef struct
 
 // stores all devices (inputs and outputs)
 MidiDevice devices[MAX_DEVICES] = {0};
+
 // Represents an open midi connection to the selected midi device
 PortMidiStream *stream = NULL;
+
 int device_count = 0;
 
 static void add_devices(int num_of_devices);

@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "../ui/ui.h"
 
-#define UI_MAX_KEYS 21
-#define UI_MAX_NUM_OF_NOTES 128
+#define MAX_NOTES_ON_UI 21
+#define MAX_NUM_OF_NOTES 120
+#define KEY_PADDING 2
 #define UI_SCREEN_WIDTH GetScreenWidth()
 #define UI_SCREEN_HEIGHT GetScreenHeight()
 
@@ -31,64 +32,128 @@ typedef struct
 } UINote;
 
 UIElement create_el_container(int x_offset, int screen_height, int width, double height_ratio);
-UINote create_wht_note_with_multiplier(UIElement el, int num);
 UINote create_wht_note(UIElement el);
 UINote create_blk_note(UIElement el);
 
-UINote notes[UI_MAX_NUM_OF_NOTES] = {};
+// based on MAX_NUM_OF_NOTES 120
+UINote wht_notes[70] = {};
+UINote blk_notes[50] = {};
 
 void ui_create_keyboard()
 {
     int x_offset = 20;
     double height_ratio = 0.6;
     UIElement container = create_el_container(x_offset, UI_SCREEN_HEIGHT, UI_SCREEN_WIDTH, height_ratio);
-    // UINote wht_note = create_wht_note(container);
-    //  UINote blk_note = create_blk_note(wht_note.el);
 
-    // chromatic scale
-    // black keys are: 1, 3, 6, 8, 10
-    // white keys are: 0, 2, 4, 5, 7, 9, 11
+    /* black keys are: 1, 3, 6, 8, 10
+       white keys are: 0, 2, 4, 5, 7, 9, 11 */
     int is_black_key[12] = {0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0};
     int wht_key_counter = 0;
 
-    // space between keys
-    int key_padding = 2;
-    int total_key_padding = UI_MAX_KEYS * key_padding;
-    int wht_note_width = (container.width - total_key_padding) / UI_MAX_KEYS;
+    // padding between white keys
+    int total_key_padding = MAX_NOTES_ON_UI * KEY_PADDING;
+    int wht_note_width = (container.width - total_key_padding) / MAX_NOTES_ON_UI;
 
-    for (int i = 0; i < UI_MAX_NUM_OF_NOTES; i++)
+    // draw white keys
+    for (int i = 0; i < MAX_NUM_OF_NOTES; i++)
     {
         // keeps the index within an octave
         if (!is_black_key[i % 12])
         {
-            // create white key
-            // need to create a UINote and add it to the array.
-            int x_offset = container.x_offset + (wht_key_counter * (wht_note_width + key_padding));
-            DrawRectangle(x_offset, container.y_offset, wht_note_width, container.height, primary_text);
+            /* white key x-offset: starts at the same x-offset as the contianer, then adds the key width plus padding times the key number. */
+            int x_offset = container.x_offset + (wht_key_counter * (wht_note_width + KEY_PADDING));
+
+            // create
+            UINote wht_note = {};
+            wht_note.el.x_offset = x_offset;
+            wht_note.el.y_offset = container.y_offset;
+            wht_note.el.width = wht_note_width;
+            wht_note.el.height = container.height;
+            wht_note.el.color = primary_text;
+            wht_note.id = i;
+            wht_note.is_pressed = 0;
+
+            // calcualte the degree based on the i value
+            int d = i % 12;
+            if (d == 0 || d == 2 || d == 4 || d == 5 || d == 7 || d == 9 || d == 11 || d == 12)
+            {
+                // add to array
+                wht_notes[i] = wht_note;
+
+                // midi simulation
+                wht_notes[14].is_pressed = 1;
+                wht_notes[16].is_pressed = 1;
+                wht_notes[24].is_pressed = 1;
+
+                // press key
+                if (wht_notes[i].is_pressed)
+                {
+                    wht_notes[i].el.color = success_midi;
+                }
+
+                // draw from array
+                DrawRectangle(wht_notes[i].el.x_offset,
+                              wht_notes[i].el.y_offset,
+                              wht_notes[i].el.width,
+                              wht_notes[i].el.height,
+                              wht_notes[i].el.color);
+            }
             wht_key_counter++;
         }
     }
 
     wht_key_counter = 0;
 
-    for (int i = 0; i < UI_MAX_NUM_OF_NOTES; i++)
+    // draw black keys
+    for (int i = 0; i < MAX_NUM_OF_NOTES; i++)
     {
+        int x_offset = (container.x_offset + (wht_key_counter * (wht_note_width + KEY_PADDING))) - ((wht_note_width * 0.6) / 2);
+
         // keeps the index within an octave
         if (!is_black_key[i % 12])
         {
             wht_key_counter++;
         }
 
+        // create
+        UINote blk_note = {};
+        blk_note.el.x_offset = x_offset;
+        blk_note.el.y_offset = container.y_offset;
+        blk_note.el.width = wht_note_width;
+        blk_note.el.height = container.height;
+        blk_note.el.color = border;
+        blk_note.id = i;
+        blk_note.is_pressed = 0;
+
         // don't create a black key for index 4 or index 11
         int d = i % 12;
-
         if (d == 4 || d == 11)
         {
             continue;
         }
+        else if (d == 1 || d == 3 || d == 6 || d == 8 || d == 10)
+        {
 
-        int x_offset = (container.x_offset + (wht_key_counter * (wht_note_width + key_padding))) - ((wht_note_width * 0.6) / 2);
-        DrawRectangle(x_offset, container.y_offset, (wht_note_width * 0.6), container.height * 0.6, border);
+            // add to array
+            blk_notes[i] = blk_note;
+
+            // midi simulation
+            blk_notes[1].is_pressed = 1;
+            blk_notes[13].is_pressed = 1;
+            blk_notes[18].is_pressed = 1;
+
+            // press key
+            if (blk_notes[i].is_pressed)
+            {
+                blk_notes[i].el.color = failure_midi;
+            }
+
+            DrawRectangle(blk_notes[i].el.x_offset,
+                          blk_notes[i].el.y_offset,
+                          (blk_notes[i].el.width * 0.6),
+                          blk_notes[i].el.height * 0.6,
+                          blk_notes[i].el.color);
+        }
     }
 }
 
@@ -96,7 +161,7 @@ UINote create_wht_note(UIElement el)
 {
     UINote wht_note = {};
     wht_note.el = el;
-    wht_note.el.width = el.width / UI_MAX_KEYS;
+    wht_note.el.width = el.width / MAX_NOTES_ON_UI;
     wht_note.el.color = primary_text;
     DrawRectangle(wht_note.el.x_offset,
                   wht_note.el.y_offset,
@@ -138,39 +203,7 @@ UIElement create_el_container(int x_offset, int screen_height, int screen_width,
     el.y_offset = screen_height * height_ratio;
     el.width = screen_width - (el.x_offset * 2);
     el.height = (screen_height * (1 - height_ratio)) - (el.x_offset * 2);
-    DrawRectangle(el.x_offset, el.y_offset, el.width, el.height, success_midi);
+    DrawRectangle(el.x_offset, el.y_offset, el.width, el.height, background);
 
     return el;
-}
-
-UINote create_wht_note_with_multiplier(UIElement el, int multiplier)
-{
-    // space between keys
-    int key_padding = 2;
-    int total_key_padding = UI_MAX_KEYS * key_padding;
-
-    UINote note = {};
-    note.el = el;
-    note.el.x_offset = note.el.x_offset + multiplier;
-    note.el.width = (note.el.width - total_key_padding) / UI_MAX_KEYS;
-
-    if (multiplier > 0)
-    {
-        multiplier = (multiplier * note.el.width) + (multiplier * key_padding);
-    }
-
-    note.el.x_offset += multiplier;
-    note.el.color = primary_text;
-
-    DrawRectangle(note.el.x_offset,
-                  note.el.y_offset,
-                  note.el.width,
-                  note.el.height,
-                  note.el.color);
-
-    // return wht_note;
-
-    // UINote blk_note = create_blk_note(wht_note.el.x_offset, wht_note.el.y_offset, wht_note.el.width, wht_note.el.height);
-
-    return note;
 }
