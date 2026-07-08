@@ -72,7 +72,7 @@ int main()
     // }
 
     // Start the UI
-    InitWindow(GetScreenWidth(), GetScreenHeight(), UI_NAME);
+    InitWindow((GetScreenWidth()), (GetScreenHeight()), UI_NAME);
     // ToggleFullscreen();
     //  ToggleFullscreen();
 
