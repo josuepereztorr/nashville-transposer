@@ -79,6 +79,14 @@ void ui_create_keyboard()
             wht_key_counter++;
         }
 
+        // don't create a black key for index 4 or index 11
+        int d = i % 12;
+
+        if (d == 4 || d == 11)
+        {
+            continue;
+        }
+
         int x_offset = (container.x_offset + (wht_key_counter * (wht_note_width + key_padding))) - ((wht_note_width * 0.6) / 2);
         DrawRectangle(x_offset, container.y_offset, (wht_note_width * 0.6), container.height * 0.6, border);
     }
