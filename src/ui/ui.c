@@ -3,7 +3,6 @@
 
 #define MAX_NOTES_ON_UI 21
 #define MAX_NUM_OF_NOTES 120
-#define KEY_PADDING 2
 #define UI_SCREEN_WIDTH GetScreenWidth()
 #define UI_SCREEN_HEIGHT GetScreenHeight()
 
@@ -41,6 +40,9 @@ UINote blk_notes[50] = {};
 
 void ui_create_keyboard()
 {
+    // padding between white keys
+    int key_padding = 2;
+
     int x_offset = 20;
     double height_ratio = 0.6;
     UIElement container = create_el_container(x_offset, UI_SCREEN_HEIGHT, UI_SCREEN_WIDTH, height_ratio);
@@ -51,7 +53,7 @@ void ui_create_keyboard()
     int wht_key_counter = 0;
 
     // padding between white keys
-    int total_key_padding = MAX_NOTES_ON_UI * KEY_PADDING;
+    int total_key_padding = MAX_NOTES_ON_UI * key_padding;
     int wht_note_width = (container.width - total_key_padding) / MAX_NOTES_ON_UI;
 
     // draw white keys
@@ -61,7 +63,7 @@ void ui_create_keyboard()
         if (!is_black_key[i % 12])
         {
             /* white key x-offset: starts at the same x-offset as the contianer, then adds the key width plus padding times the key number. */
-            int x_offset = container.x_offset + (wht_key_counter * (wht_note_width + KEY_PADDING));
+            int x_offset = container.x_offset + (wht_key_counter * (wht_note_width + key_padding));
 
             // create
             UINote wht_note = {};
@@ -107,7 +109,7 @@ void ui_create_keyboard()
     // draw black keys
     for (int i = 0; i < MAX_NUM_OF_NOTES; i++)
     {
-        int x_offset = (container.x_offset + (wht_key_counter * (wht_note_width + KEY_PADDING))) - ((wht_note_width * 0.6) / 2);
+        int x_offset = (container.x_offset + (wht_key_counter * (wht_note_width + key_padding))) - ((wht_note_width * 0.6) / 2);
 
         // keeps the index within an octave
         if (!is_black_key[i % 12])
