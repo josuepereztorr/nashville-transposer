@@ -5,7 +5,7 @@
 #include "../utility/utility.h"
 
 // Specifies the maximum number of notes per the MIDI standard. Ranges from 0-127.
-#define MAX_NUM_OF_NOTES 128
+#define MAX_MIDI_NOTES 128
 
 typedef struct
 {
@@ -16,7 +16,7 @@ typedef struct
 } Note;
 
 // Stores the full range of notes (0-127) as Note structs.
-Note keyboard[MAX_NUM_OF_NOTES] = {0};
+Note keyboard[MAX_MIDI_NOTES] = {0};
 
 // Verifies rows read matches MAX_NUM_OF_NOTES.
 int row_counter = 0;
@@ -78,7 +78,7 @@ int theory_row_parser(char string[])
 
     note.status = 0;
 
-    if (row_counter < MAX_NUM_OF_NOTES)
+    if (row_counter < MAX_MIDI_NOTES)
     {
         keyboard[row_counter] = note;
         row_counter++;
@@ -89,7 +89,7 @@ int theory_row_parser(char string[])
 
 void theory_print_keyboard()
 {
-    for (int i = 0; i < MAX_NUM_OF_NOTES; i++)
+    for (int i = 0; i < MAX_MIDI_NOTES; i++)
     {
         print_note(keyboard[i]);
     }

@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include "../ui/ui.h"
 
-#define MAX_NOTES_ON_UI 21
-#define MAX_NUM_OF_NOTES 120
+#define MAX_UI_NOTES 21
+#define MAX_MIDI_NOTES 128
+#define MAX_WHT_NOTES 74
+#define MAX_BLK_NOTES 53
 #define UI_SCREEN_WIDTH GetScreenWidth()
 #define UI_SCREEN_HEIGHT GetScreenHeight()
 
@@ -35,127 +37,146 @@ UINote create_wht_note(UIElement el);
 UINote create_blk_note(UIElement el);
 
 // based on MAX_NUM_OF_NOTES 120
-UINote wht_notes[70] = {};
-UINote blk_notes[50] = {};
+UINote wht_notes[MAX_WHT_NOTES] = {0};
+
+UINote blk_notes[MAX_BLK_NOTES] = {0};
+
+UINote notes[MAX_MIDI_NOTES] = {0};
 
 void ui_create_keyboard()
 {
-    // padding between white keys
-    int key_padding = 2;
+    // padding between white note
+    int note_padding = 2;
 
     int x_offset = 20;
     double height_ratio = 0.6;
     UIElement container = create_el_container(x_offset, UI_SCREEN_HEIGHT, UI_SCREEN_WIDTH, height_ratio);
 
-    /* black keys are: 1, 3, 6, 8, 10
-       white keys are: 0, 2, 4, 5, 7, 9, 11 */
-    int is_black_key[12] = {0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0};
-    int wht_key_counter = 0;
+    /* black notes are: 1, 3, 6, 8, 10
+       white notes are: 0, 2, 4, 5, 7, 9, 11 */
+    int is_black_note[12] = {0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0};
 
-    // padding between white keys
-    int total_key_padding = MAX_NOTES_ON_UI * key_padding;
-    int wht_note_width = (container.width - total_key_padding) / MAX_NOTES_ON_UI;
+    // Purpose: wht_note_width multiplier
+    int wht_note_counter = 0;
 
-    // draw white keys
-    for (int i = 0; i < MAX_NUM_OF_NOTES; i++)
+    // padding between white notes
+    int total_padding = MAX_UI_NOTES * note_padding;
+    int wht_note_width = ((container.width - total_padding) / MAX_UI_NOTES);
+    // int wht_note_width = ((container.width - total_padding) / MAX_UI_NOTES) + note_padding;
+
+    // Purpose: draw all 74 white notes
+    for (int midi_index = 0; midi_index < MAX_MIDI_NOTES; midi_index++)
     {
-        // keeps the index within an octave
-        if (!is_black_key[i % 12])
+        // Purpose: checks if the current midi note is a black note based on the is_black_note array.
+        if (!is_black_note[midi_index % 12])
         {
-            /* white key x-offset: starts at the same x-offset as the contianer, then adds the key width plus padding times the key number. */
-            int x_offset = container.x_offset + (wht_key_counter * (wht_note_width + key_padding));
+            // LOGIC FOR ALL WHITE NOTES
 
-            // create
-            UINote wht_note = {};
-            wht_note.el.x_offset = x_offset;
-            wht_note.el.y_offset = container.y_offset;
-            wht_note.el.width = wht_note_width;
-            wht_note.el.height = container.height;
-            wht_note.el.color = primary_text;
-            wht_note.id = i;
-            wht_note.is_pressed = 0;
+            // calculate the chromatic scale degree based on the midi_index value
+            int degree = midi_index % 12;
 
-            // calcualte the degree based on the i value
-            int d = i % 12;
-            if (d == 0 || d == 2 || d == 4 || d == 5 || d == 7 || d == 9 || d == 11 || d == 12)
+            if (degree == 0 || degree == 2 ||
+                degree == 4 || degree == 5 ||
+                degree == 7 || degree == 9 ||
+                degree == 11 || degree == 12)
             {
+                /* white note x-offset: starts at the same x-offset as the contianer, then adds the note width plus padding times the note number. */
+                int x_offset = container.x_offset + (wht_note_counter * (wht_note_width + note_padding));
+
+                // create struct
+                UINote wht_note = {0};
+                wht_note.el.x_offset = x_offset;
+                wht_note.el.y_offset = container.y_offset;
+                wht_note.el.width = wht_note_width;
+                wht_note.el.height = container.height;
+                wht_note.el.color = primary_text;
+                wht_note.id = midi_index;
+                wht_note.is_pressed = 0;
+
                 // add to array
-                wht_notes[i] = wht_note;
+                notes[midi_index] = wht_note;
 
-                // midi simulation
-                wht_notes[14].is_pressed = 1;
-                wht_notes[16].is_pressed = 1;
-                wht_notes[24].is_pressed = 1;
+                // TEST DATA
+                notes[2].is_pressed = 1;
+                notes[7].is_pressed = 1;
+                notes[11].is_pressed = 1;
 
-                // press key
-                if (wht_notes[i].is_pressed)
+                // check if the current note is pressed
+                if (notes[midi_index].is_pressed)
                 {
-                    wht_notes[i].el.color = success_midi;
+                    notes[midi_index].el.color = success_midi;
                 }
 
                 // draw from array
-                DrawRectangle(wht_notes[i].el.x_offset,
-                              wht_notes[i].el.y_offset,
-                              wht_notes[i].el.width,
-                              wht_notes[i].el.height,
-                              wht_notes[i].el.color);
+                // PROBLEM - INDEX GOES OUT OF BOUNDS - OUT OF MEMORY
+                DrawRectangle(notes[midi_index].el.x_offset,
+                              notes[midi_index].el.y_offset,
+                              notes[midi_index].el.width,
+                              notes[midi_index].el.height,
+                              notes[midi_index].el.color);
             }
-            wht_key_counter++;
+
+            // increase counter
+            wht_note_counter++;
         }
     }
 
-    wht_key_counter = 0;
+    // reset counter
+    wht_note_counter = 0;
 
-    // draw black keys
-    for (int i = 0; i < MAX_NUM_OF_NOTES; i++)
+    // Purpose: draw all 53 black notes
+    for (int midi_index = 0; midi_index < MAX_MIDI_NOTES; midi_index++)
     {
-        int x_offset = (container.x_offset + (wht_key_counter * (wht_note_width + key_padding))) - ((wht_note_width * 0.6) / 2);
+        // LOGIC FOR ALL BLACK NOTES
 
-        // keeps the index within an octave
-        if (!is_black_key[i % 12])
+        // increase counter
+        if (!is_black_note[midi_index % 12])
         {
-            wht_key_counter++;
+            wht_note_counter++;
         }
 
-        // create
-        UINote blk_note = {};
+        int degree = midi_index % 12;
+
+        // 4 to 5 and 7-1 is only a half a step, meaning no black notes
+        if (degree == 4 || degree == 11)
+        {
+            // don't add any keys
+            continue;
+        }
+
+        // TODO - CHECK IF I CAN JUST REMOVE THE MULTIPLE
+        /* black note x-offset: starts at the same x-offset as the contianer, then adds the note width plus padding times the note number. */
+        int x_offset = (container.x_offset + (wht_note_counter * (wht_note_width + note_padding)) - ((wht_note_width * 0.6) / 2));
+
+        // create struct
+        UINote blk_note = {0};
         blk_note.el.x_offset = x_offset;
         blk_note.el.y_offset = container.y_offset;
         blk_note.el.width = wht_note_width;
         blk_note.el.height = container.height;
         blk_note.el.color = border;
-        blk_note.id = i;
+        blk_note.id = midi_index;
         blk_note.is_pressed = 0;
 
-        // don't create a black key for index 4 or index 11
-        int d = i % 12;
-        if (d == 4 || d == 11)
+        // add to array
+        notes[midi_index] = blk_note;
+
+        // midi simulation
+        notes[18].is_pressed = 1;
+        notes[20].is_pressed = 1;
+        notes[22].is_pressed = 1;
+
+        // press note
+        if (notes[midi_index].is_pressed)
         {
-            continue;
+            notes[midi_index].el.color = failure_midi;
         }
-        else if (d == 1 || d == 3 || d == 6 || d == 8 || d == 10)
-        {
 
-            // add to array
-            blk_notes[i] = blk_note;
-
-            // midi simulation
-            blk_notes[1].is_pressed = 1;
-            blk_notes[13].is_pressed = 1;
-            blk_notes[18].is_pressed = 1;
-
-            // press key
-            if (blk_notes[i].is_pressed)
-            {
-                blk_notes[i].el.color = failure_midi;
-            }
-
-            DrawRectangle(blk_notes[i].el.x_offset,
-                          blk_notes[i].el.y_offset,
-                          (blk_notes[i].el.width * 0.6),
-                          blk_notes[i].el.height * 0.6,
-                          blk_notes[i].el.color);
-        }
+        DrawRectangle(notes[midi_index].el.x_offset,
+                      notes[midi_index].el.y_offset,
+                      (notes[midi_index].el.width * 0.6),
+                      notes[midi_index].el.height * 0.6,
+                      notes[midi_index].el.color);
     }
 }
 
@@ -163,7 +184,7 @@ UINote create_wht_note(UIElement el)
 {
     UINote wht_note = {};
     wht_note.el = el;
-    wht_note.el.width = el.width / MAX_NOTES_ON_UI;
+    wht_note.el.width = el.width / MAX_UI_NOTES;
     wht_note.el.color = primary_text;
     DrawRectangle(wht_note.el.x_offset,
                   wht_note.el.y_offset,
