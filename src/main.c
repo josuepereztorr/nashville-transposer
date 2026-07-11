@@ -85,6 +85,7 @@ int main()
 
         // other logic
         ui_create_keyboard();
+        ui_create_main_window();
         EndDrawing();
     }
 

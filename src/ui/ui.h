@@ -12,5 +12,6 @@ extern const Color success_midi;
 extern const Color failure_midi;
 
 void ui_create_keyboard();
+void ui_create_main_window();
 
 #endif

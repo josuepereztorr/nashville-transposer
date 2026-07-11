@@ -10,6 +10,8 @@
 
 const Color background = {18, 20, 28, 255};
 const Color foreground = {27, 29, 40, 255};
+const Color wht_key_pressed = {59, 130, 246, 255};
+const Color blk_key_pressed = {30, 58, 138, 255};
 const Color border = {42, 45, 58, 255};
 const Color primary_text = {242, 242, 245, 255};
 const Color secondary_text = {148, 251, 166, 255};
@@ -32,6 +34,7 @@ typedef struct
     int id;
 } UINote;
 
+void ui_create_main_window();
 UIElement create_el_container(int x_offset, int screen_height, int width, double height_ratio);
 UINote create_wht_note(UIElement el);
 UINote create_blk_note(UIElement el);
@@ -42,6 +45,10 @@ UINote wht_notes[MAX_WHT_NOTES] = {0};
 UINote blk_notes[MAX_BLK_NOTES] = {0};
 
 UINote notes[MAX_MIDI_NOTES] = {0};
+
+void ui_create_main_window()
+{
+}
 
 void ui_create_keyboard()
 {
@@ -104,7 +111,7 @@ void ui_create_keyboard()
                 // check if the current note is pressed
                 if (notes[midi_index].is_pressed)
                 {
-                    notes[midi_index].el.color = success_midi;
+                    notes[midi_index].el.color = wht_key_pressed;
                 }
 
                 // draw from array
@@ -169,7 +176,7 @@ void ui_create_keyboard()
         // press note
         if (notes[midi_index].is_pressed)
         {
-            notes[midi_index].el.color = failure_midi;
+            notes[midi_index].el.color = blk_key_pressed;
         }
 
         DrawRectangle(notes[midi_index].el.x_offset,
