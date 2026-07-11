@@ -86,7 +86,7 @@ int main()
 
         // Clears the frame
         ClearBackground(background);
-
+        ui_crate_midi_device_container();
         // other logic
         ui_create_keyboard();
         // ui_create_drowndown();

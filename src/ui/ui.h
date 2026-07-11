@@ -11,6 +11,7 @@ extern const Color secondary_text;
 extern const Color success_midi;
 extern const Color failure_midi;
 
+void ui_crate_midi_device_container();
 void ui_create_keyboard();
 void ui_create_drowndown();
 

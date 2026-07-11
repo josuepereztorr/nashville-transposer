@@ -37,7 +37,6 @@ typedef struct
     int id;
 } UINote;
 
-void ui_create_drowndown();
 UIElement create_el_container(int x_offset, int screen_height, int width, double height_ratio);
 UINote create_wht_note(UIElement el);
 UINote create_blk_note(UIElement el);
@@ -49,8 +48,24 @@ UINote blk_notes[MAX_BLK_NOTES] = {0};
 
 UINote notes[MAX_MIDI_NOTES] = {0};
 
-void ui_crate_midi_container()
+void ui_crate_midi_device_container()
 {
+    int y_offset = 20;
+    int center_width = (GetScreenWidth() / 2);
+    int small_width = (GetScreenWidth() / 4);
+    int height = (GetScreenHeight() / 4);
+    // left container
+    // x-offset adds margin to the left of the container
+    // y-offset doesn't change
+    DrawRectangle(20, y_offset, small_width - 20, height, failure_midi);
+    // center container
+    // x-offset adds left margin between left and center container
+    // y-offset doesn't change
+    DrawRectangle(small_width + 20, y_offset, center_width - 20, height, success_midi);
+    // right container
+    // x-offset adds left margin between center and right container
+    // y-offset doesn't change
+    DrawRectangle(small_width + center_width + 20, y_offset, small_width - 40, height, failure_midi);
 }
 
 void ui_create_drowndown()
@@ -78,7 +93,7 @@ void ui_create_keyboard()
     // padding between white note
     int note_padding = 2;
 
-    int x_offset = 0;
+    int x_offset = 20;
     double height_ratio = 0.6;
     UIElement container = create_el_container(x_offset, UI_SCREEN_HEIGHT, UI_SCREEN_WIDTH, height_ratio);
 
@@ -255,7 +270,7 @@ UIElement create_el_container(int x_offset, int screen_height, int screen_width,
     el.x_offset = x_offset;
     el.y_offset = screen_height * height_ratio;
     el.width = screen_width - (el.x_offset * 2);
-    el.height = (screen_height * (1 - height_ratio)) - (el.x_offset * 2);
+    el.height = ((screen_height * (1 - height_ratio)) - (el.x_offset * 2)) - 40;
     DrawRectangle(el.x_offset, el.y_offset, el.width, el.height, background);
 
     return el;
