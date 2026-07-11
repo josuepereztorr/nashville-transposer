@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include "../ui/ui.h"
 
-#define MAX_UI_NOTES 21
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
+
+#define MAX_UI_NOTES 28
 #define MAX_MIDI_NOTES 128
 #define MAX_WHT_NOTES 74
 #define MAX_BLK_NOTES 53
@@ -34,7 +37,7 @@ typedef struct
     int id;
 } UINote;
 
-void ui_create_main_window();
+void ui_create_drowndown();
 UIElement create_el_container(int x_offset, int screen_height, int width, double height_ratio);
 UINote create_wht_note(UIElement el);
 UINote create_blk_note(UIElement el);
@@ -46,8 +49,28 @@ UINote blk_notes[MAX_BLK_NOTES] = {0};
 
 UINote notes[MAX_MIDI_NOTES] = {0};
 
-void ui_create_main_window()
+void ui_crate_midi_container()
 {
+}
+
+void ui_create_drowndown()
+{
+    const char *text = "; Digital Input; Digital Output; Midi Keyboard";
+    int is_active = 0;
+    int is_editable = 0;
+
+    Rectangle rec = {0};
+    rec.height = 200;
+    rec.width = 400;
+    rec.x = 20;
+    rec.y = 20;
+
+    if (GuiDropdownBox(rec, text, &is_active, is_editable))
+    {
+        is_editable = !is_editable;
+    }
+
+    DrawText(TextFormat("Selected index: %i", is_active), 150, 150, 20, DARKGRAY);
 }
 
 void ui_create_keyboard()
@@ -55,7 +78,7 @@ void ui_create_keyboard()
     // padding between white note
     int note_padding = 2;
 
-    int x_offset = 20;
+    int x_offset = 0;
     double height_ratio = 0.6;
     UIElement container = create_el_container(x_offset, UI_SCREEN_HEIGHT, UI_SCREEN_WIDTH, height_ratio);
 
@@ -169,9 +192,9 @@ void ui_create_keyboard()
         notes[midi_index] = blk_note;
 
         // midi simulation
-        notes[18].is_pressed = 1;
-        notes[20].is_pressed = 1;
-        notes[22].is_pressed = 1;
+        notes[3].is_pressed = 1;
+        notes[8].is_pressed = 1;
+        notes[10].is_pressed = 1;
 
         // press note
         if (notes[midi_index].is_pressed)

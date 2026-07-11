@@ -3,6 +3,7 @@
 #include "theory/theory.h"
 #include "midi/midi.h"
 #include "ui/ui.h"
+#include "ui/raygui.h"
 
 // CSV
 #define CSV_DATA_PATH "./data/midi_notes.csv"
@@ -74,7 +75,10 @@ int main()
     // Start the UI
     InitWindow((GetScreenWidth()), (GetScreenHeight()), UI_NAME);
     // ToggleFullscreen();
-    //  ToggleFullscreen();
+
+    // const char *text = "; Digital Input; Digital Output; Midi Keyboard";
+    // int is_active = 0;
+    // int is_editable = 0;
 
     while (!WindowShouldClose())
     {
@@ -85,7 +89,20 @@ int main()
 
         // other logic
         ui_create_keyboard();
-        ui_create_main_window();
+        // ui_create_drowndown();
+
+        // Rectangle rec = {0};
+        // rec.height = 200;
+        // rec.width = 400;
+        // rec.x = 20;
+        // rec.y = 20;
+
+        // if (GuiDropdownBox(rec, text, &is_active, is_editable))
+        // {
+        //     is_editable = !is_editable;
+        // }
+
+        // DrawText(TextFormat("Selected index: %i", is_active), 400, 400, 20, WHITE);
         EndDrawing();
     }
 
