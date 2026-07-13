@@ -4,7 +4,7 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
-#define MAX_UI_NOTES 28
+#define MAX_UI_NOTES 21
 #define MAX_MIDI_NOTES 128
 #define MAX_WHT_NOTES 74
 #define MAX_BLK_NOTES 53
@@ -50,22 +50,28 @@ UINote notes[MAX_MIDI_NOTES] = {0};
 
 void ui_crate_midi_device_container()
 {
-    int y_offset = 20;
-    int center_width = (GetScreenWidth() / 2);
-    int small_width = (GetScreenWidth() / 4);
-    int height = (GetScreenHeight() / 4);
-    // left container
-    // x-offset adds margin to the left of the container
-    // y-offset doesn't change
-    DrawRectangle(20, y_offset, small_width - 20, height, failure_midi);
+    // margins
+    int x_offset_margin = 20;
+    int y_offset_margin = 20;
+
+    // width
+    int half_width = (GetScreenWidth() / 2);
+    int quarter_width = (GetScreenWidth() / 4);
+
+    // height
+    double height_ratio = 0.6;
+    int half_height = (GetScreenHeight() * height_ratio) / 2;
+    int full_height = (GetScreenHeight() * height_ratio) - 40;
+
+    // left side containers
+    DrawRectangle(x_offset_margin, y_offset_margin, quarter_width - 20, half_height - 40, failure_midi);
+    DrawRectangle(x_offset_margin, half_height, quarter_width - 20, half_height - 20, failure_midi);
+
     // center container
-    // x-offset adds left margin between left and center container
-    // y-offset doesn't change
-    DrawRectangle(small_width + 20, y_offset, center_width - 20, height, success_midi);
+    DrawRectangle(quarter_width + x_offset_margin, y_offset_margin, half_width - 20, full_height, success_midi);
+
     // right container
-    // x-offset adds left margin between center and right container
-    // y-offset doesn't change
-    DrawRectangle(small_width + center_width + 20, y_offset, small_width - 40, height, failure_midi);
+    DrawRectangle(quarter_width + half_width + x_offset_margin, y_offset_margin, quarter_width - 40, full_height, failure_midi);
 }
 
 void ui_create_drowndown()
@@ -270,7 +276,7 @@ UIElement create_el_container(int x_offset, int screen_height, int screen_width,
     el.x_offset = x_offset;
     el.y_offset = screen_height * height_ratio;
     el.width = screen_width - (el.x_offset * 2);
-    el.height = ((screen_height * (1 - height_ratio)) - (el.x_offset * 2)) - 40;
+    el.height = ((screen_height * (1 - height_ratio)) - (el.x_offset * 2));
     DrawRectangle(el.x_offset, el.y_offset, el.width, el.height, background);
 
     return el;
