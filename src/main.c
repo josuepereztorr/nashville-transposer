@@ -87,9 +87,8 @@ int main()
         // Clears the frame
         ClearBackground(FILL_COLOR);
 
-        ui_crate_midi_device_container();
-
         ui_create_keyboard();
+        ui_create_containers();
         // ui_create_drowndown();
 
         // Rectangle rec = {0};

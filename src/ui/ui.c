@@ -16,6 +16,11 @@
 #define WIDTH_RATIO 0.6f
 #define HEIGHT_RATIO 0.6f
 #define NOTE_PADDING 2.0f
+#define CONTAINER_ROUNDNESS_SM 0.1f
+#define CONTAINER_ROUNDNESS_MD 0.06f
+#define CONTAINER_ROUNDNESS_LG 0.04f
+#define CONTAINER_SEGMENTS 16
+#define CONTAINER_LINE_THICK 1.25F
 
 typedef struct
 {
@@ -51,26 +56,19 @@ static const bool is_blk_note[12] = {
     false}; // B
 
 // based on MAX_NUM_OF_NOTES 120
-UINote wht_notes[MAX_WHT_NOTES] = {0};
-
-UINote blk_notes[MAX_BLK_NOTES] = {0};
-
 UINote notes[MAX_MIDI_NOTES] = {0};
 
 float total_padding = MAX_UI_NOTES * NOTE_PADDING;
 
-const Color success_midi;
-const Color failure_midi;
+const Color success_midi = {74, 222, 128, 255};
+const Color failure_midi = {232, 97, 93, 255};
 
+void draw_container(Rectangle rec, float roundness);
 void create_wht_notes(int note_index, Rectangle container);
 void create_blk_notes(int note_index, Rectangle container);
 
-void ui_crate_midi_device_container()
+void ui_create_containers()
 {
-    // margins
-    int x_offset_margin = 20;
-    int y_offset_margin = 20;
-
     // width
     int half_width = (GetScreenWidth() / 2);
     int quarter_width = (GetScreenWidth() / 4);
@@ -81,38 +79,51 @@ void ui_crate_midi_device_container()
 
     // left side containers
     Rectangle midi_device_container = {
-        .x = x_offset_margin,
-        .y = y_offset_margin,
-        .width = quarter_width - 20,
-        .height = half_height - 40};
+        .x = X_OFFSET_MARGIN,
+        .y = Y_OFFSET_MARGIN,
+        .width = quarter_width - X_OFFSET_MARGIN,
+        .height = half_height - (Y_OFFSET_MARGIN * 2)};
 
-    DrawRectangleRec(midi_device_container, failure_midi);
+    draw_container(midi_device_container, CONTAINER_ROUNDNESS_SM);
 
     Rectangle scale_selection_container = {
-        .x = x_offset_margin,
+        .x = X_OFFSET_MARGIN,
         .y = half_height,
-        .width = quarter_width - 20,
-        .height = half_height - 20};
+        .width = quarter_width - X_OFFSET_MARGIN,
+        .height = half_height - Y_OFFSET_MARGIN};
 
-    DrawRectangleRec(scale_selection_container, failure_midi);
+    draw_container(scale_selection_container, CONTAINER_ROUNDNESS_SM);
 
     // center container
     Rectangle transposer_container = {
-        .x = quarter_width + x_offset_margin,
-        .y = y_offset_margin,
-        .width = half_width - 20,
+        .x = quarter_width + X_OFFSET_MARGIN,
+        .y = Y_OFFSET_MARGIN,
+        .width = half_width - X_OFFSET_MARGIN,
         .height = full_height};
 
-    DrawRectangleRec(transposer_container, success_midi);
+    draw_container(transposer_container, CONTAINER_ROUNDNESS_LG);
 
     // right container
     Rectangle history_container = {
-        .x = quarter_width + half_width + x_offset_margin,
-        .y = y_offset_margin,
-        .width = quarter_width - 40,
+        .x = quarter_width + half_width + X_OFFSET_MARGIN,
+        .y = Y_OFFSET_MARGIN,
+        .width = quarter_width - (X_OFFSET_MARGIN * 2),
         .height = full_height};
 
-    DrawRectangleRec(history_container, failure_midi);
+    draw_container(history_container, CONTAINER_ROUNDNESS_MD);
+}
+
+void draw_container(Rectangle rec, float roundness)
+{
+    DrawRectangleRounded(rec,
+                         roundness,
+                         CONTAINER_SEGMENTS,
+                         FORGROUND_COLOR);
+    DrawRectangleRoundedLinesEx(rec,
+                                roundness,
+                                CONTAINER_SEGMENTS,
+                                CONTAINER_LINE_THICK,
+                                BORDER_COLOR);
 }
 
 // void ui_create_drowndown()
@@ -147,7 +158,8 @@ void ui_create_keyboard()
     container.y = screen_height * HEIGHT_RATIO;
     container.width = screen_width - (container.x * 2.0f);
     container.height = ((screen_height * (1.0f - HEIGHT_RATIO)) - (container.x * 2.0f));
-    DrawRectangleRec(container, FILL_COLOR);
+    // DrawRectangleRec(container, FORGROUND_COLOR);
+    draw_container(container, CONTAINER_ROUNDNESS_LG);
 
     // white note padding
     int wht_note_width = (int)((container.width - total_padding) / MAX_UI_NOTES);
@@ -239,6 +251,7 @@ void create_blk_notes(int note_index, const Rectangle container)
         }
 
         int wht_note_width = (int)((container.width - total_padding) / MAX_UI_NOTES);
+        printf("%i\n\n", wht_note_width);
 
         float wht_note_offset = note_index * (wht_note_width + NOTE_PADDING);
         float blk_note_offset = (wht_note_width * WIDTH_RATIO) / 2.0f;
