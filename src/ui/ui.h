@@ -13,7 +13,6 @@
 #define BLK_NOTE_COLOR (Color){42, 45, 58, 255}
 
 void ui_create_containers();
-void ui_create_keyboard();
 // void ui_create_drowndown();
 
 #endif

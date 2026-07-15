@@ -124,7 +124,23 @@ void ui_create_containers()
         .width = full_width - X_OFFSET_MARGIN,
         .height = (screen_height * 0.4) - Y_OFFSET_MARGIN};
 
+    // content
+    Rectangle content_container = {
+        .x = 6849.0f,
+        .y = 712.0f,
+        .width = 258300.0f,
+        .height = 401.0f};
+
     draw_container(keyboard_container, CONTAINER_ROUNDNESS_MD);
+
+    int wht_note_index = 0;
+
+    create_wht_notes(wht_note_index, keyboard_container);
+
+    // reset counter
+    wht_note_index = 0;
+
+    create_blk_notes(wht_note_index, keyboard_container);
 }
 
 void draw_container(Rectangle rec, float roundness)
@@ -160,36 +176,14 @@ void draw_container(Rectangle rec, float roundness)
 //     DrawText(TextFormat("Selected index: %i", is_active), 150, 150, 20, DARKGRAY);
 // }
 
-void ui_create_keyboard()
-{
-    // window dimentions
-    int screen_width = GetScreenWidth();
-    int screen_height = GetScreenHeight();
-
-    // keyboard container
-    Rectangle container = {0};
-    container.x = X_OFFSET_MARGIN;
-    container.y = screen_height * HEIGHT_RATIO;
-    container.width = screen_width - (container.x * 2.0f);
-    container.height = ((screen_height * (1.0f - HEIGHT_RATIO)) - (container.x * 2.0f));
-    // DrawRectangleRec(container, FORGROUND_COLOR);
-    draw_container(container, CONTAINER_ROUNDNESS_LG);
-
-    // white note padding
-    int wht_note_width = (int)((container.width - total_padding) / MAX_UI_NOTES);
-
-    int wht_note_index = 0;
-
-    create_wht_notes(wht_note_index, container);
-
-    // reset counter
-    wht_note_index = 0;
-
-    create_blk_notes(wht_note_index, container);
-}
-
+// TODO - SEPARATE MIDI NOTE STRUCT CREATION VS THE UI'S 3 OCTAVE KEYBOARD
 void create_wht_notes(int note_index, const Rectangle container)
 {
+    float content_x_offset = 0.0f;
+    float content_y_offset = 0.0f;
+    float content_width = 0.0f;
+    float content_height = 0.0f;
+
     // draw all 74 white notes
     for (int midi_index = 0; midi_index < MAX_MIDI_NOTES; midi_index++)
     {
@@ -205,15 +199,15 @@ void create_wht_notes(int note_index, const Rectangle container)
                 degree == 7 || degree == 9 ||
                 degree == 11 || degree == 12)
             {
-                int wht_note_width = (int)((container.width - total_padding) / MAX_UI_NOTES);
+                int wht_note_width = 90;
 
                 // create struct
                 UINote note = {
                     .color = WHT_NOTE_COLOR};
-                note.rec.x = container.x + (note_index * (wht_note_width + NOTE_PADDING));
-                note.rec.y = container.y;
+                note.rec.x = container.x + (note_index * (wht_note_width + NOTE_PADDING)) + X_OFFSET_MARGIN;
+                note.rec.y = container.y + Y_OFFSET_MARGIN;
                 note.rec.width = wht_note_width;
-                note.rec.height = container.height;
+                note.rec.height = container.height - (Y_OFFSET_MARGIN * 2);
                 note.is_pressed = false;
                 note.id = midi_index;
 
@@ -231,18 +225,22 @@ void create_wht_notes(int note_index, const Rectangle container)
                     notes[midi_index].color = wht_note_pressed_color;
                 }
 
-                // draw from array
-                DrawRectangle(notes[midi_index].rec.x,
-                              notes[midi_index].rec.y,
-                              notes[midi_index].rec.width,
-                              notes[midi_index].rec.height,
-                              notes[midi_index].color);
+                DrawRectangleRounded(notes[midi_index].rec,
+                                     0.1f,
+                                     CONTAINER_SEGMENTS,
+                                     notes[midi_index].color);
+
+                content_x_offset = note.rec.x;
+                content_y_offset = note.rec.y;
+                content_width += note.rec.x;
+                content_height = container.height - (Y_OFFSET_MARGIN * 2);
             }
 
             // increase counter
             note_index++;
         }
     }
+    printf("X: %lf\nY: %lf\nWidth: %lf\nHeight:%lf\n\n", content_x_offset, content_y_offset, content_width, content_height);
 }
 
 void create_blk_notes(int note_index, const Rectangle container)
@@ -264,18 +262,17 @@ void create_blk_notes(int note_index, const Rectangle container)
             continue;
         }
 
-        int wht_note_width = (int)((container.width - total_padding) / MAX_UI_NOTES);
-        printf("%i\n\n", wht_note_width);
+        int wht_note_width = 90;
 
         float wht_note_offset = note_index * (wht_note_width + NOTE_PADDING);
         float blk_note_offset = (wht_note_width * WIDTH_RATIO) / 2.0f;
 
         UINote note = {
             .color = BLK_NOTE_COLOR};
-        note.rec.x = (container.x + wht_note_offset) - blk_note_offset;
-        note.rec.y = container.y;
+        note.rec.x = (X_OFFSET_MARGIN + (container.x + wht_note_offset) - blk_note_offset);
+        note.rec.y = container.y + Y_OFFSET_MARGIN;
         note.rec.width = wht_note_width * WIDTH_RATIO;
-        note.rec.height = container.height * HEIGHT_RATIO;
+        note.rec.height = (container.height * HEIGHT_RATIO) - (Y_OFFSET_MARGIN * 2);
         note.is_pressed = false;
         note.id = midi_index;
 
@@ -293,6 +290,10 @@ void create_blk_notes(int note_index, const Rectangle container)
             notes[midi_index].color = blk_note_pressed_color;
         }
 
-        DrawRectangleRec(notes[midi_index].rec, notes[midi_index].color);
+        // DrawRectangleRec(notes[midi_index].rec, notes[midi_index].color);
+        DrawRectangleRounded(notes[midi_index].rec,
+                             0.03f,
+                             CONTAINER_SEGMENTS,
+                             notes[midi_index].color);
     }
 }
