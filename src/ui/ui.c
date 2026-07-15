@@ -16,7 +16,7 @@
 #define WIDTH_RATIO 0.6f
 #define HEIGHT_RATIO 0.6f
 #define NOTE_PADDING 2.0f
-#define CONTAINER_ROUNDNESS_SM 0.1f
+#define CONTAINER_ROUNDNESS_SM 0.08f
 #define CONTAINER_ROUNDNESS_MD 0.06f
 #define CONTAINER_ROUNDNESS_LG 0.04f
 #define CONTAINER_SEGMENTS 16
@@ -69,13 +69,18 @@ void create_blk_notes(int note_index, Rectangle container);
 
 void ui_create_containers()
 {
+    // window dimentions
+    int screen_width = GetScreenWidth();
+    int screen_height = GetScreenHeight();
+
     // width
-    int half_width = (GetScreenWidth() / 2);
-    int quarter_width = (GetScreenWidth() / 4);
+    int quarter_width = screen_width / 4;
+    int half_width = screen_width / 2;
+    int full_width = screen_width - X_OFFSET_MARGIN;
 
     // height
-    int half_height = (GetScreenHeight() * HEIGHT_RATIO) / 2;
-    int full_height = (GetScreenHeight() * HEIGHT_RATIO) - 40;
+    int half_height = (screen_height * HEIGHT_RATIO) / 2;
+    int full_height = (screen_height * HEIGHT_RATIO) - (Y_OFFSET_MARGIN * 2);
 
     // left side containers
     Rectangle midi_device_container = {
@@ -111,6 +116,15 @@ void ui_create_containers()
         .height = full_height};
 
     draw_container(history_container, CONTAINER_ROUNDNESS_MD);
+
+    // bottom container
+    Rectangle keyboard_container = {
+        .x = X_OFFSET_MARGIN,
+        .y = screen_height * HEIGHT_RATIO,
+        .width = full_width - X_OFFSET_MARGIN,
+        .height = (screen_height * 0.4) - Y_OFFSET_MARGIN};
+
+    draw_container(keyboard_container, CONTAINER_ROUNDNESS_MD);
 }
 
 void draw_container(Rectangle rec, float roundness)

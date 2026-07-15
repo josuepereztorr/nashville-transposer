@@ -73,8 +73,14 @@ int main()
     // }
 
     // Start the UI
-    InitWindow((GetScreenWidth()), (GetScreenHeight()), UI_NAME);
-    // ToggleFullscreen();
+    InitWindow(1, 1, UI_NAME);
+
+    int monitor = GetCurrentMonitor();
+    int screen_width = GetMonitorWidth(monitor);
+    int screen_height = GetMonitorHeight(monitor);
+
+    SetWindowSize(screen_width, screen_height);
+    ToggleFullscreen();
 
     // const char *text = "; Digital Input; Digital Output; Midi Keyboard";
     // int is_active = 0;
@@ -87,7 +93,7 @@ int main()
         // Clears the frame
         ClearBackground(FILL_COLOR);
 
-        ui_create_keyboard();
+        // ui_create_keyboard();
         ui_create_containers();
         // ui_create_drowndown();
 
