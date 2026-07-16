@@ -84,42 +84,79 @@ void ui_create_containers()
     int half_width = screen_width / 2;
 
     // height
-    int half_ratio_height = (screen_height * CONT_UPPER_HEIGHT_RATIO) / 2;
-    int ratio_height = screen_height * CONT_UPPER_HEIGHT_RATIO;
+    int half_height_ratio = (screen_height * CONT_UPPER_HEIGHT_RATIO) / 2;
+    int height_ratio = screen_height * CONT_UPPER_HEIGHT_RATIO;
 
-    // containers
+    // MIDI DEVICE
     Rectangle midi_device_container = {
         .x = X_OFFSET_MARGIN,
         .y = Y_OFFSET_MARGIN,
         .width = quarter_width - X_OFFSET_MARGIN,
-        .height = half_ratio_height - (Y_OFFSET_MARGIN * 2)};
+        .height = half_height_ratio - (Y_OFFSET_MARGIN * 2)};
 
     draw_container(midi_device_container, CONT_ROUNDNESS_SM);
 
+    // SCALE SELECTION
     Rectangle scale_selection_container = {
         .x = X_OFFSET_MARGIN,
-        .y = half_ratio_height,
+        .y = half_height_ratio,
         .width = quarter_width - X_OFFSET_MARGIN,
-        .height = half_ratio_height - Y_OFFSET_MARGIN};
+        .height = half_height_ratio - Y_OFFSET_MARGIN};
 
     draw_container(scale_selection_container, CONT_ROUNDNESS_SM);
 
+    // TRANSPOSER
     Rectangle transposer_container = {
         .x = quarter_width + X_OFFSET_MARGIN,
         .y = Y_OFFSET_MARGIN,
         .width = half_width - X_OFFSET_MARGIN,
-        .height = ratio_height - (Y_OFFSET_MARGIN * 2)};
+        .height = height_ratio - (Y_OFFSET_MARGIN * 2)};
 
     draw_container(transposer_container, CONT_ROUNDNESS_LG);
 
+    Rectangle transposer_upper_container = {
+        .x = transposer_container.x + (X_OFFSET_MARGIN * 2),
+        .y = transposer_container.y + (Y_OFFSET_MARGIN * 2),
+        .width = transposer_container.width - (X_OFFSET_MARGIN * 4),
+        .height = (transposer_container.height - (Y_OFFSET_MARGIN * 4)) / 2};
+
+    DrawRectangleRounded(transposer_upper_container, 0, 0, success_midi);
+
+    Rectangle transposer_lower_l_container = {
+        .x = transposer_upper_container.x,
+        .y = transposer_upper_container.height + (Y_OFFSET_MARGIN * 5),
+        .width = (transposer_container.width - (X_OFFSET_MARGIN * 2)) / 2,
+        .height = (transposer_container.height - (Y_OFFSET_MARGIN * 7)) / 2};
+
+    DrawRectangleRounded(transposer_lower_l_container, 0, 0, failure_midi);
+
+    Rectangle transposer_lower_r_container = {
+        .x = transposer_lower_l_container.x + transposer_lower_l_container.width,
+        .y = transposer_lower_l_container.y,
+        .width = transposer_lower_l_container.width - (X_OFFSET_MARGIN * 2),
+        .height = transposer_lower_l_container.height};
+
+    DrawRectangleRounded(transposer_lower_r_container, 0, 0, blk_note_pressed_color);
+
+    DrawText("CURRENT NOTE", transposer_lower_l_container.x + (X_OFFSET_MARGIN * 6), transposer_lower_l_container.y + (Y_OFFSET_MARGIN * 2), 30, BLACK);
+    DrawText("D4", transposer_lower_l_container.x + (X_OFFSET_MARGIN * 7), transposer_lower_l_container.y + (Y_OFFSET_MARGIN * 4), 160, BLACK);
+
+    DrawText("TARGET NOTE", transposer_lower_r_container.x + (X_OFFSET_MARGIN * 5), transposer_lower_r_container.y + (Y_OFFSET_MARGIN * 2), 30, BLACK);
+    DrawText("A4", transposer_lower_r_container.x + (X_OFFSET_MARGIN * 6), transposer_lower_r_container.y + (Y_OFFSET_MARGIN * 4), 160, BLACK);
+
+    DrawText("NASHVILLE NUMBER", transposer_upper_container.x + (X_OFFSET_MARGIN * 17), transposer_upper_container.y + (Y_OFFSET_MARGIN * 3), 30, BLACK);
+    DrawText("5", transposer_upper_container.x + (X_OFFSET_MARGIN * 22), transposer_upper_container.y + (Y_OFFSET_MARGIN * 5), 160, BLACK);
+
+    // HISTORY
     Rectangle history_container = {
         .x = quarter_width + half_width + X_OFFSET_MARGIN,
         .y = Y_OFFSET_MARGIN,
         .width = quarter_width - (X_OFFSET_MARGIN * 2),
-        .height = ratio_height - (Y_OFFSET_MARGIN * 2)};
+        .height = height_ratio - (Y_OFFSET_MARGIN * 2)};
 
     draw_container(history_container, CONT_ROUNDNESS_MD);
 
+    // KEYBOARD
     Rectangle keyboard_container = {
         .x = X_OFFSET_MARGIN,
         .y = screen_height * CONT_UPPER_HEIGHT_RATIO,
@@ -152,32 +189,28 @@ void draw_container(Rectangle rec, float roundness)
                                 BORDER_COLOR);
 }
 
-// void ui_create_drowndown()
-// {
-//     const char *text = "; Digital Input; Digital Output; Midi Keyboard";
-//     int is_active = 0;
-//     int is_editable = 0;
-
-//     Rectangle rec = {0};
-//     rec.height = 200;
-//     rec.width = 400;
-//     rec.x = 20;
-//     rec.y = 20;
-
-//     if (GuiDropdownBox(rec, text, &is_active, is_editable))
-//     {
-//         is_editable = !is_editable;
-//     }
-
-//     DrawText(TextFormat("Selected index: %i", is_active), 150, 150, 20, DARKGRAY);
-// }
-// returns the width (int) of an individual white note based on TOTAL_WHT_NOTES.
-
 int get_wht_note_width(Rectangle rec)
 {
     float content_width = rec.width - TOTAL_NOTE_PADDING - X_OFFSET_MARGIN;
     int wht_note_width = (int)(content_width / TOTAL_WHT_NOTES);
     return wht_note_width;
+}
+
+UINote create_wht_note(int note_index, const Rectangle container)
+{
+    int wht_note_width = get_wht_note_width(container);
+
+    // create struct
+    UINote note = {
+        .color = WHT_NOTE_COLOR};
+    note.rec.x = container.x + (note_index * (wht_note_width + WHT_NOTE_TRAIL_PADDING)) + X_OFFSET_MARGIN;
+    note.rec.y = container.y + Y_OFFSET_MARGIN;
+    note.rec.width = wht_note_width;
+    note.rec.height = container.height - (Y_OFFSET_MARGIN * 2);
+    note.is_pressed = false;
+    note.id = 0;
+
+    return note;
 }
 
 void draw_wht_notes(int note_index, const Rectangle container)
@@ -214,23 +247,6 @@ void draw_wht_notes(int note_index, const Rectangle container)
             note_index++;
         }
     }
-}
-
-UINote create_wht_note(int note_index, const Rectangle container)
-{
-    int wht_note_width = get_wht_note_width(container);
-
-    // create struct
-    UINote note = {
-        .color = WHT_NOTE_COLOR};
-    note.rec.x = container.x + (note_index * (wht_note_width + WHT_NOTE_TRAIL_PADDING)) + X_OFFSET_MARGIN;
-    note.rec.y = container.y + Y_OFFSET_MARGIN;
-    note.rec.width = wht_note_width;
-    note.rec.height = container.height - (Y_OFFSET_MARGIN * 2);
-    note.is_pressed = false;
-    note.id = 0;
-
-    return note;
 }
 
 UINote create_blk_note(int note_index, const Rectangle container)
@@ -293,3 +309,24 @@ void draw_blk_notes(int note_index, const Rectangle container)
                              notes[midi_index].color);
     }
 }
+
+// void ui_create_drowndown()
+// {
+//     const char *text = "; Digital Input; Digital Output; Midi Keyboard";
+//     int is_active = 0;
+//     int is_editable = 0;
+
+//     Rectangle rec = {0};
+//     rec.height = 200;
+//     rec.width = 400;
+//     rec.x = 20;
+//     rec.y = 20;
+
+//     if (GuiDropdownBox(rec, text, &is_active, is_editable))
+//     {
+//         is_editable = !is_editable;
+//     }
+
+//     DrawText(TextFormat("Selected index: %i", is_active), 150, 150, 20, DARKGRAY);
+// }
+// returns the width (int) of an individual white note based on TOTAL_WHT_NOTES.
