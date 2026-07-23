@@ -8,9 +8,6 @@
 // CSV
 #define CSV_DATA_PATH "./data/midi_notes.csv"
 
-// UI
-#define UI_NAME "Nashville Transposer"
-
 void external();
 
 int main()
@@ -72,43 +69,22 @@ int main()
     //     fprintf(stderr, "midi_terminate failed: %d\n ", error);
     // }
 
-    // Start the UI
-    InitWindow(1, 1, UI_NAME);
+    // UI CODE
+    ui_setup();
 
-    int monitor = GetCurrentMonitor();
-    int screen_width = GetMonitorWidth(monitor);
-    int screen_height = GetMonitorHeight(monitor);
-
-    SetWindowSize(screen_width, screen_height);
-    ToggleFullscreen();
-
-    // const char *text = "; Digital Input; Digital Output; Midi Keyboard";
-    // int is_active = 0;
-    // int is_editable = 0;
+    int is_active = 0;
+    bool is_editable = 0;
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
 
-        // Clears the frame
         ClearBackground(FILL_COLOR);
 
-        // ui_create_keyboard();
         ui_create_containers();
-        // ui_create_drowndown();
 
-        // Rectangle rec = {0};
-        // rec.height = 200;
-        // rec.width = 400;
-        // rec.x = 20;
-        // rec.y = 20;
+        create_key_selection_dropdown(&is_active, &is_editable);
 
-        // if (GuiDropdownBox(rec, text, &is_active, is_editable))
-        // {
-        //     is_editable = !is_editable;
-        // }
-
-        // DrawText(TextFormat("Selected index: %i", is_active), 400, 400, 20, WHITE);
         EndDrawing();
     }
 

@@ -4,6 +4,8 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+#define UI_NAME "Nashville Transposer"
+
 // LOGIC
 #define NUM_OF_OCTAVES 3
 #define NOTES_IN_OCTAVE 12
@@ -72,6 +74,20 @@ UINote create_wht_note(int note_index, const Rectangle container);
 void draw_wht_notes(int note_index, Rectangle container);
 UINote create_blk_note(int note_index, const Rectangle container);
 void draw_blk_notes(int note_index, Rectangle container);
+Vector2 get_center(Rectangle container, Vector2 size);
+Vector2 center_container(Rectangle container);
+
+void ui_setup()
+{
+    InitWindow(1, 1, UI_NAME);
+
+    int monitor = GetCurrentMonitor();
+    int screen_width = GetMonitorWidth(monitor);
+    int screen_height = GetMonitorHeight(monitor);
+
+    SetWindowSize(screen_width, screen_height);
+    ToggleFullscreen();
+}
 
 void ui_create_containers()
 {
@@ -114,21 +130,39 @@ void ui_create_containers()
 
     draw_container(transposer_container, CONT_ROUNDNESS_LG);
 
+    // HORIZONTAL LINE
+    Rectangle transposer_upper_container2 = {
+        .x = transposer_container.x + (X_OFFSET_MARGIN * 2),
+        .y = transposer_container.y + (Y_OFFSET_MARGIN * 2.1f),
+        .width = transposer_container.width - (X_OFFSET_MARGIN * 4),
+        .height = (transposer_container.height - (Y_OFFSET_MARGIN * 4)) / 2};
+
+    DrawRectangleRounded(transposer_upper_container2, 0, 0, DIVIDER_COLOR);
+
     Rectangle transposer_upper_container = {
         .x = transposer_container.x + (X_OFFSET_MARGIN * 2),
         .y = transposer_container.y + (Y_OFFSET_MARGIN * 2),
         .width = transposer_container.width - (X_OFFSET_MARGIN * 4),
         .height = (transposer_container.height - (Y_OFFSET_MARGIN * 4)) / 2};
 
-    DrawRectangleRounded(transposer_upper_container, 0, 0, success_midi);
+    DrawRectangleRounded(transposer_upper_container, 0, 0, FORGROUND_COLOR);
 
+    // VERTICAL LINE
     Rectangle transposer_lower_l_container = {
         .x = transposer_upper_container.x,
         .y = transposer_upper_container.height + (Y_OFFSET_MARGIN * 5),
-        .width = (transposer_container.width - (X_OFFSET_MARGIN * 2)) / 2,
+        .width = ((transposer_container.width - (X_OFFSET_MARGIN * 4)) / 2) + (Y_OFFSET_MARGIN * 0.1f),
         .height = (transposer_container.height - (Y_OFFSET_MARGIN * 7)) / 2};
 
-    DrawRectangleRounded(transposer_lower_l_container, 0, 0, failure_midi);
+    DrawRectangleRounded(transposer_lower_l_container, 0, 0, DIVIDER_COLOR);
+
+    Rectangle transposer_lower_l_container2 = {
+        .x = transposer_upper_container.x,
+        .y = transposer_upper_container.height + (Y_OFFSET_MARGIN * 5),
+        .width = (transposer_container.width - (X_OFFSET_MARGIN * 4)) / 2,
+        .height = (transposer_container.height - (Y_OFFSET_MARGIN * 7)) / 2};
+
+    DrawRectangleRounded(transposer_lower_l_container2, 0, 0, FORGROUND_COLOR);
 
     Rectangle transposer_lower_r_container = {
         .x = transposer_lower_l_container.x + transposer_lower_l_container.width,
@@ -136,16 +170,31 @@ void ui_create_containers()
         .width = transposer_lower_l_container.width - (X_OFFSET_MARGIN * 2),
         .height = transposer_lower_l_container.height};
 
-    DrawRectangleRounded(transposer_lower_r_container, 0, 0, blk_note_pressed_color);
+    DrawRectangleRounded(transposer_lower_r_container, 0, 0, FORGROUND_COLOR);
 
-    DrawText("CURRENT NOTE", transposer_lower_l_container.x + (X_OFFSET_MARGIN * 6), transposer_lower_l_container.y + (Y_OFFSET_MARGIN * 2), 30, BLACK);
-    DrawText("D4", transposer_lower_l_container.x + (X_OFFSET_MARGIN * 7), transposer_lower_l_container.y + (Y_OFFSET_MARGIN * 4), 160, BLACK);
+    char *five = "5";
+    char *nash = "NASHVILLE NUMBER";
+    Vector2 five_v = get_center(transposer_upper_container, MeasureTextEx(GetFontDefault(), five, 160, 5.0f));
+    Vector2 nash_v = get_center(transposer_upper_container, MeasureTextEx(GetFontDefault(), nash, 30, 5.0f));
+    nash_v.y = nash_v.y - five_v.y;
+    DrawTextEx(GetFontDefault(), five, five_v, 160, 5.0f, DEGREE_COLOR);
+    DrawTextEx(GetFontDefault(), nash, nash_v, 30, 5.0f, HEADER_COLOR);
 
-    DrawText("TARGET NOTE", transposer_lower_r_container.x + (X_OFFSET_MARGIN * 5), transposer_lower_r_container.y + (Y_OFFSET_MARGIN * 2), 30, BLACK);
-    DrawText("A4", transposer_lower_r_container.x + (X_OFFSET_MARGIN * 6), transposer_lower_r_container.y + (Y_OFFSET_MARGIN * 4), 160, BLACK);
+    char *current_note = "D4";
+    char *current_title = "CURRENT NOTE";
+    Vector2 current_note_v = get_center(transposer_lower_l_container, MeasureTextEx(GetFontDefault(), current_note, 160, 5.0f));
+    Vector2 current_title_v = get_center(transposer_lower_l_container, MeasureTextEx(GetFontDefault(), current_title, 30, 5.0f));
+    current_title_v.y = current_note_v.y - (Y_OFFSET_MARGIN * 2.0f);
+    DrawTextEx(GetFontDefault(), current_note, current_note_v, 160, 5.0f, WHITE);
+    DrawTextEx(GetFontDefault(), current_title, current_title_v, 30, 5.0f, HEADER_COLOR);
 
-    DrawText("NASHVILLE NUMBER", transposer_upper_container.x + (X_OFFSET_MARGIN * 17), transposer_upper_container.y + (Y_OFFSET_MARGIN * 3), 30, BLACK);
-    DrawText("5", transposer_upper_container.x + (X_OFFSET_MARGIN * 22), transposer_upper_container.y + (Y_OFFSET_MARGIN * 5), 160, BLACK);
+    char *target_note = "A4";
+    char *target_title = "TARGET NOTE";
+    Vector2 target_note_v = get_center(transposer_lower_r_container, MeasureTextEx(GetFontDefault(), target_note, 160, 5.0f));
+    Vector2 target_title_v = get_center(transposer_lower_r_container, MeasureTextEx(GetFontDefault(), target_title, 30, 5.0f));
+    target_title_v.y = target_note_v.y - (Y_OFFSET_MARGIN * 2.0f);
+    DrawTextEx(GetFontDefault(), target_note, target_note_v, 160, 5.0f, TARGET_COLOR);
+    DrawTextEx(GetFontDefault(), target_title, target_title_v, 30, 5.0f, HEADER_COLOR);
 
     // HISTORY
     Rectangle history_container = {
@@ -310,23 +359,32 @@ void draw_blk_notes(int note_index, const Rectangle container)
     }
 }
 
-// void ui_create_drowndown()
-// {
-//     const char *text = "; Digital Input; Digital Output; Midi Keyboard";
-//     int is_active = 0;
-//     int is_editable = 0;
+Vector2 get_center(Rectangle container, Vector2 size)
+{
+    return (Vector2){
+        .x = (container.x + (container.width / 2.0f)) - (size.x / 2.0f),
+        .y = (container.y + (container.height / 2.0f)) - (size.y / 2.0f)};
+}
 
-//     Rectangle rec = {0};
-//     rec.height = 200;
-//     rec.width = 400;
-//     rec.x = 20;
-//     rec.y = 20;
+Vector2 center_container(Rectangle container)
+{
+    return (Vector2){
+        .x = container.width * 0.20f,
+        .y = container.height * 0.20f};
+}
 
-//     if (GuiDropdownBox(rec, text, &is_active, is_editable))
-//     {
-//         is_editable = !is_editable;
-//     }
+void create_key_selection_dropdown(int *is_active, bool *is_editable)
+{
+    const char *scales_str = "C Major;C# Major;D Major;D# Major;E Major;F Major;F# Major;G Major;G# Major;A Major;A# Major;B Major";
 
-//     DrawText(TextFormat("Selected index: %i", is_active), 150, 150, 20, DARKGRAY);
-// }
-// returns the width (int) of an individual white note based on TOTAL_WHT_NOTES.
+    Rectangle rec = {0};
+    rec.height = 50;
+    rec.width = 1000;
+    rec.x = 20;
+    rec.y = 20;
+
+    if (GuiDropdownBox(rec, scales_str, is_active, *is_editable))
+    {
+        *is_editable = !*is_editable;
+    }
+}
