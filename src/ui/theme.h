@@ -8,6 +8,7 @@
 #define RL_FILL_COLOR (Color){18, 20, 28, 255}
 
 // Nuklear colors
+#define NK_TRANSPARENT nk_rgba(0, 0, 0, 0)
 #define NK_FILL_COLOR nk_rgba(18, 20, 28, 255)
 #define NK_FOREGROUND_COLOR nk_rgba(27, 29, 40, 255)
 #define NK_PRIMARY_TEXT_COLOR nk_rgba(242, 242, 245, 255)

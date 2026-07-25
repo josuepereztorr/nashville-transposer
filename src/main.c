@@ -9,10 +9,10 @@
 #include "raylib.h"
 #include "ui/vendor/raylib-nuklear.h"
 
+#include "ui/views/history_container.h"
+
 // CSV
 #define CSV_DATA_PATH "./data/midi_notes.csv"
-
-void external();
 
 int main()
 {
@@ -76,6 +76,7 @@ int main()
     /* ----------------------------------------------------------------------------------------------------------*/
     // RAYLIB
     struct nk_context *ctx = app_init(0);
+    Vector2 scr_size = get_monitor_dimensions();
 
     if (ctx == NULL)
     {
@@ -90,11 +91,19 @@ int main()
         // check for state change
         UpdateNuklear(ctx);
 
-        // describes the ui
         ui_create_containers();
 
+        // describes the ui
+        if (nk_begin(ctx, "main", nk_rect(0, 0, scr_size.x, scr_size.y), NK_WINDOW_NO_SCROLLBAR))
+        {
+            // draw_history_container(ctx);
+        }
+        nk_end(ctx);
+
         BeginDrawing();
-        ClearBackground(RL_FILL_COLOR);
+
+        // background color is set in app_init.c
+        ClearBackground(BLACK);
         DrawNuklear(ctx);
         EndDrawing();
     }
