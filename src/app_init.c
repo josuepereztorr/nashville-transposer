@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#define RAYLIB_NUKLEAR_IMPLEMENTATION
-#include "ui/vendor/raylib-nuklear.h"
 #include "app_init.h"
+#include "ui/vendor/raylib-nuklear.h"
+#include "ui/theme.h"
 
 #define UI_NAME "Nashville Transposer"
 
@@ -28,4 +28,4 @@ struct nk_context *app_init(int font_size)
     return ctx;
 }
 
-// clang -g src/main.c src/csv_reader/*.c src/theory/*.c src/utility/*.c src/midi/*.c src/ui/*.c src/ui/nuklear_backend/*.c -I/usr/local/include -L/usr/local/lib -lportmidi -lraylib -o build/nashville_transposer
+// clang -g src/*.c src/csv_reader/*.c src/theory/*.c src/utility/*.c src/midi/*.c src/ui/*.c -I/usr/local/include -L/usr/local/lib -lportmidi -lraylib -o build/nashville_transposer
