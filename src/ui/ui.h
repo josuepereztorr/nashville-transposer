@@ -4,7 +4,7 @@
 #include "raylib.h"
 
 // COLORS
-#define FILL_COLOR (Color){18, 20, 28, 255}
+// #define FILL_COLOR (Color){18, 20, 28, 255}
 #define FORGROUND_COLOR (Color){27, 29, 40, 255}
 #define PRIMARY_TEXT_COLOR (Color){242, 242, 245, 255}
 #define SECONDARY_TEXT_COLOR (Color){148, 251, 166, 255}

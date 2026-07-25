@@ -4,6 +4,7 @@
 #include "midi/midi.h"
 #include "ui/ui.h"
 #include "ui/nuklear_backend/nuklear_backend.h"
+#include "ui/theme.h"
 
 // CSV
 #define CSV_DATA_PATH "./data/midi_notes.csv"
@@ -86,7 +87,7 @@ int main()
         // 4. Draw - everything that gets drawn after update logic is computed.
         // ex. dropdown goes last.
 
-        ClearBackground(FILL_COLOR);
+        ClearBackground(RL_FILL_COLOR);
 
         ui_create_containers();
 

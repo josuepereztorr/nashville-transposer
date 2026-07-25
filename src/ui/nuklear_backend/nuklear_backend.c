@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "raylib.h"
 
 #define RAYLIB_NUKLEAR_IMPLEMENTATION
 #include "raylib-nuklear.h"
