@@ -15,3 +15,5 @@ target_include_directories(nashville_transposer PRIVATE
 
 target_link_directories(nashville_transposer PRIVATE /usr/local/lib)
 target_link_libraries(nashville_transposer PRIVATE raylib portmidi)
+
+# cd build && cmake .. && cmake --build . && cd .. && ./build/nashville_transposer

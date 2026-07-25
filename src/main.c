@@ -4,7 +4,10 @@
 #include "midi/midi.h"
 #include "ui/ui.h"
 #include "ui/theme.h"
+
 #include "app_init.h"
+#include "raylib.h"
+#include "ui/vendor/raylib-nuklear.h"
 
 // CSV
 #define CSV_DATA_PATH "./data/midi_notes.csv"
@@ -72,67 +75,35 @@ int main()
 
     /* ----------------------------------------------------------------------------------------------------------*/
     // RAYLIB
-
-    // 1. Anything that should exist only once for the lifetime of the program, doesn't change frame by frame.
-    // ex. InitWindow, any LoadX() call, GuiSetStyle()/font - themes, Persistent state variables such as dropdown_open, active_index, appLayout
-
-    // must happer after raylib's InitWindow() and it's created only once.
     struct nk_context *ctx = app_init(0);
 
-    // 2. Loop Condition - checks for ESC or window closed.
+    if (ctx == NULL)
+    {
+        fprintf(stderr, "Failed to initialize the UI context.");
+        CloseWindow();
+        return 1;
+    }
+
+    // checks for ESC or window closed.
     while (!WindowShouldClose())
     {
-        // 3. Update/Logic - this is where you read input and update state, don't draw anything.
-        // ex. midi events, any logic that changes, update dropdown values
-        // nk_backend_update(ctx);
+        // check for state change
+        UpdateNuklear(ctx);
 
-        // describes the ui/gui
-        // nk_backend_draw_frame(ctx);
-
-        BeginDrawing();
-        // 4. Draw - everything that gets drawn after update logic is computed.
-        // ex. dropdown goes last.
-
-        ClearBackground(RL_FILL_COLOR);
-
-        // actually draws the ui/gui
-        // nk_backend_end_frame(ctx);
-
+        // describes the ui
         ui_create_containers();
 
+        BeginDrawing();
+        ClearBackground(RL_FILL_COLOR);
+        DrawNuklear(ctx);
         EndDrawing();
     }
 
-    // 4. Teardown - close everything that was setup.
-    // ex. every Loadx() needs a matching UnloadX() function. CloseWindow() goes last.
-    // nk_backend_unload(ctx);
+    // release resources
+    UnloadNuklear(ctx);
     CloseWindow();
 
     /* ----------------------------------------------------------------------------------------------------------*/
 
     return 0;
 };
-
-// temp callback function
-void external()
-{
-    // printf("inside of the external function\n");
-}
-
-//  Terminal Build Commands
-//    clang -g src/main.c src/csv_reader/*.c src/theory/*.c src/utility/*.c src/midi/*.c src/ui/*.c -I/usr/local/include -L/usr/local/lib -lportmidi -lraylib -o build/nashville_transposer
-//    ./build/nashville_transposer
-/*
-    Notes:
-    - what happens if the midi device is disconnected while it's reading?
-    - would my program freeze? what are the different states of my program?
-    - disable or gray out the keboard UI, device information etc if no midi is connected.
-
-    - I would like the start function to handle
-        1. Pm_Initialize() - Start PortMidi
-        2. Pm_CountDevices() - How many devices are connected?
-
-    TODO
-    - Terminal color change
-
-*/

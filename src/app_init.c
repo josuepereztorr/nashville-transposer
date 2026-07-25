@@ -2,11 +2,10 @@
 
 #include "app_init.h"
 #include "ui/vendor/raylib-nuklear.h"
-#include "ui/theme.h"
 
 #define UI_NAME "Nashville Transposer"
 
-// Initialize the Nuklear context for use with Raylib. Loads the default font and sets up GL resources.
+// Initializes a window based on the monitor dimensions and initializes a Nuklear context.
 struct nk_context *app_init(int font_size)
 {
     // initializes a window and OpenGL context. Set's up a temporary 1x1 window.
@@ -23,9 +22,13 @@ struct nk_context *app_init(int font_size)
 
     // initializes the Nuklear context for use with Raylib. Loads the default font and sets up GL resources.
     struct nk_context *ctx = InitNuklear(font_size);
+
+    if (ctx == NULL)
+    {
+        return NULL;
+    }
+
     // add themes via theme.c
 
     return ctx;
 }
-
-// clang -g src/*.c src/csv_reader/*.c src/theory/*.c src/utility/*.c src/midi/*.c src/ui/*.c -I/usr/local/include -L/usr/local/lib -lportmidi -lraylib -o build/nashville_transposer
