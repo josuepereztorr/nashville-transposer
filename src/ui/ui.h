@@ -16,7 +16,6 @@
 #define DEGREE_COLOR (Color){151, 133, 234, 255}
 #define TARGET_COLOR (Color){59, 125, 237, 255}
 
-void ui_setup();
 void ui_create_containers();
 void create_key_selection_dropdown(int *is_active, bool *is_editable);
 

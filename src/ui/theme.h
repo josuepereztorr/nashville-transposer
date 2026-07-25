@@ -2,7 +2,7 @@
 #define THEME_H
 
 #include "raylib.h"
-#include "nuklear_backend/nuklear.h"
+#include "vendor/nuklear.h"
 
 // Raylib colors
 #define RL_FILL_COLOR (Color){18, 20, 28, 255}

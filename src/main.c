@@ -3,8 +3,9 @@
 #include "theory/theory.h"
 #include "midi/midi.h"
 #include "ui/ui.h"
-#include "ui/nuklear_backend/nuklear_backend.h"
+#include "nuklear_backend.h"
 #include "ui/theme.h"
+#include "app_init.h"
 
 // CSV
 #define CSV_DATA_PATH "./data/midi_notes.csv"
@@ -70,24 +71,33 @@ int main()
     //     fprintf(stderr, "midi_terminate failed: %d\n ", error);
     // }
 
+    /* ----------------------------------------------------------------------------------------------------------*/
     // RAYLIB
 
     // 1. Anything that should exist only once for the lifetime of the program, doesn't change frame by frame.
-    // ex. InitWindow, any LoadX() call, GuiSetStyle()/font - themes, Persistent state variables such as dropdown_open, active_index, appLayout.
-    ui_setup();
-    nuklear_setup();
+    // ex. InitWindow, any LoadX() call, GuiSetStyle()/font - themes, Persistent state variables such as dropdown_open, active_index, appLayout
+
+    // must happer after raylib's InitWindow() and it's created only once.
+    struct nk_context *ctx = app_init(0);
 
     // 2. Loop Condition - checks for ESC or window closed.
     while (!WindowShouldClose())
     {
         // 3. Update/Logic - this is where you read input and update state, don't draw anything.
         // ex. midi events, any logic that changes, update dropdown values
+        // nk_backend_update(ctx);
+
+        // describes the ui/gui
+        // nk_backend_draw_frame(ctx);
 
         BeginDrawing();
         // 4. Draw - everything that gets drawn after update logic is computed.
         // ex. dropdown goes last.
 
         ClearBackground(RL_FILL_COLOR);
+
+        // actually draws the ui/gui
+        // nk_backend_end_frame(ctx);
 
         ui_create_containers();
 
@@ -96,7 +106,11 @@ int main()
 
     // 4. Teardown - close everything that was setup.
     // ex. every Loadx() needs a matching UnloadX() function. CloseWindow() goes last.
+    // nk_backend_unload(ctx);
     CloseWindow();
+
+    /* ----------------------------------------------------------------------------------------------------------*/
+
     return 0;
 };
 

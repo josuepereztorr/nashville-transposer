@@ -3,8 +3,6 @@
 
 #include "raylib.h"
 
-#define UI_NAME "Nashville Transposer"
-
 // LOGIC
 #define NUM_OF_OCTAVES 3
 #define NOTES_IN_OCTAVE 12
@@ -75,18 +73,6 @@ UINote create_blk_note(int note_index, const Rectangle container);
 void draw_blk_notes(int note_index, Rectangle container);
 Vector2 get_center(Rectangle container, Vector2 size);
 Vector2 center_container(Rectangle container);
-
-void ui_setup()
-{
-    InitWindow(1, 1, UI_NAME);
-
-    int monitor = GetCurrentMonitor();
-    int screen_width = GetMonitorWidth(monitor);
-    int screen_height = GetMonitorHeight(monitor);
-
-    SetWindowSize(screen_width, screen_height);
-    ToggleFullscreen();
-}
 
 void ui_create_containers()
 {
