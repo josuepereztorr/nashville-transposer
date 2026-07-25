@@ -3,7 +3,7 @@
 #include "theory/theory.h"
 #include "midi/midi.h"
 #include "ui/ui.h"
-#include "ui/raygui.h"
+#include "ui/nuklear_backend/nuklear_backend.h"
 
 // CSV
 #define CSV_DATA_PATH "./data/midi_notes.csv"
@@ -69,25 +69,32 @@ int main()
     //     fprintf(stderr, "midi_terminate failed: %d\n ", error);
     // }
 
-    // UI CODE
+    // RAYLIB
+
+    // 1. Anything that should exist only once for the lifetime of the program, doesn't change frame by frame.
+    // ex. InitWindow, any LoadX() call, GuiSetStyle()/font - themes, Persistent state variables such as dropdown_open, active_index, appLayout.
     ui_setup();
+    nuklear_setup();
 
-    int is_active = 0;
-    bool is_editable = 0;
-
+    // 2. Loop Condition - checks for ESC or window closed.
     while (!WindowShouldClose())
     {
+        // 3. Update/Logic - this is where you read input and update state, don't draw anything.
+        // ex. midi events, any logic that changes, update dropdown values
+
         BeginDrawing();
+        // 4. Draw - everything that gets drawn after update logic is computed.
+        // ex. dropdown goes last.
 
         ClearBackground(FILL_COLOR);
 
         ui_create_containers();
 
-        create_key_selection_dropdown(&is_active, &is_editable);
-
         EndDrawing();
     }
 
+    // 4. Teardown - close everything that was setup.
+    // ex. every Loadx() needs a matching UnloadX() function. CloseWindow() goes last.
     CloseWindow();
     return 0;
 };

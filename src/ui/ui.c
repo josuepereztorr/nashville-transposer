@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include "../ui/ui.h"
 
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+#include "raylib.h"
 
 #define UI_NAME "Nashville Transposer"
 
@@ -383,8 +382,8 @@ void create_key_selection_dropdown(int *is_active, bool *is_editable)
     rec.x = 20;
     rec.y = 20;
 
-    if (GuiDropdownBox(rec, scales_str, is_active, *is_editable))
-    {
-        *is_editable = !*is_editable;
-    }
+    // if (GuiDropdownBox(rec, scales_str, is_active, *is_editable))
+    // {
+    //     *is_editable = !*is_editable;
+    // }
 }
