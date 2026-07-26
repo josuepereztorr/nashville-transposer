@@ -30,6 +30,9 @@ struct nk_context *app_init(int font_size)
     // add transperent window since the window color is
     // ctx->style.window.fixed_background = nk_style_item_color(NK_FILL_COLOR);
     ctx->style.window.fixed_background = nk_style_item_color(NK_TRANSPARENT);
+    ctx->style.window.spacing = nk_vec2(0, 0);
+    ctx->style.window.padding = nk_vec2(0, 0);
+    ctx->style.window.group_padding = nk_vec2(0, 0);
 
     return ctx;
 }
@@ -40,6 +43,6 @@ Vector2 get_monitor_dimensions()
     // returns the index of the current monitor where the window is placed and gets the current monitor dimensions.
     int monitor = GetCurrentMonitor();
     return (Vector2){
-        .x = GetMonitorWidth(monitor),
-        .y = GetMonitorHeight(monitor)};
+        .x = (float)GetMonitorWidth(monitor),
+        .y = (float)GetMonitorHeight(monitor)};
 }
