@@ -1,5 +1,5 @@
-#ifndef HISTORY_CONTAINER_H
-#define HISTORY_CONTAINER_H
+#ifndef HISTORY_H
+#define HISTORY_H
 
 #include "../vendor/nuklear.h"
 
