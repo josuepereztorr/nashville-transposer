@@ -1,9 +1,15 @@
+// std
 #include <stdio.h>
 
-#include "app_init.h"
-#include "ui/vendor/raylib-nuklear.h"
-#include "ui/theme.h"
+// vendor
 #include "raylib.h"
+#include "ui/vendor/raylib-nuklear.h"
+
+// shared
+#include "app_init.h"
+#include "ui/theme.h"
+
+// views
 
 #define UI_NAME "Nashville Transposer"
 
@@ -12,7 +18,6 @@ struct nk_context *app_init(int font_size)
 {
     // initializes a window and OpenGL context. Set's up a temporary 1x1 window.
     InitWindow(1, 1, UI_NAME);
-
     Vector2 monitor_dimensions = get_monitor_dimensions();
 
     // resizes the current window to the monitor dimensions and toggles fullscreen mode.
@@ -27,9 +32,8 @@ struct nk_context *app_init(int font_size)
         return NULL;
     }
 
-    // add transperent window since the window color is
-    // ctx->style.window.fixed_background = nk_style_item_color(NK_FILL_COLOR);
-    ctx->style.window.fixed_background = nk_style_item_color(NK_TRANSPARENT);
+    // sets up global theme properties
+    ctx->style.window.fixed_background = nk_style_item_color(NK_FILL_COLOR);
     ctx->style.window.spacing = nk_vec2(0, 0);
     ctx->style.window.padding = nk_vec2(0, 0);
     ctx->style.window.group_padding = nk_vec2(0, 0);

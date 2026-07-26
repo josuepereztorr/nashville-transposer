@@ -1,6 +1,7 @@
 #ifndef SCALE_SELECTION_H
 #define SCALE_SELECTION_H
 
+// vendor
 #include "../vendor/nuklear.h"
 
 void draw_scale_selection_container(struct nk_context *ctx);

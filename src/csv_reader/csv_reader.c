@@ -1,5 +1,7 @@
-#include <stdio.h>
 #include "csv_reader.h"
+
+// std lib
+#include <stdio.h>
 
 /* Reads a csv file from the provided filename. Returns the number of rows read.
    If a -1 is returned, the filename provided is incorrect, the file is empty, or there was an error during reading. */

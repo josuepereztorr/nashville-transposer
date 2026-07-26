@@ -1,15 +1,20 @@
+// std
 #include <stdio.h>
-#include "csv_reader/csv_reader.h"
-#include "theory/theory.h"
-#include "midi/midi.h"
-#include "ui/ui.h"
-#include "ui/theme.h"
 
-#include "app_init.h"
+// vendor
 #include "raylib.h"
 #include "ui/vendor/raylib-nuklear.h"
 
-#include "ui/views/history_container.h"
+// shared
+#include "app_init.h"
+#include "csv_reader/csv_reader.h"
+#include "theory/theory.h"
+#include "midi/midi.h"
+#include "ui/theme.h"
+#include "ui/ui.h"
+
+// views
+#include "ui/views/history.h"
 #include "ui/views/layout.h"
 
 // CSV
@@ -93,7 +98,7 @@ int main()
         UpdateNuklear(ctx);
 
         // need to refactor into Nuklear views
-        ui_create_containers();
+        // ui_create_containers();
 
         // describes the ui
         if (nk_begin(ctx, "main", nk_rect(0, 0, monitor_size.x, monitor_size.y), NK_WINDOW_NO_SCROLLBAR))

@@ -1,6 +1,7 @@
 #ifndef APP_INIT_H
 #define APP_INIT_H
 
+// vendor
 #include "raylib.h"
 #include "ui/vendor/nuklear.h"
 

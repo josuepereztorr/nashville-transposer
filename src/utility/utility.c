@@ -1,6 +1,8 @@
+#include "utility.h"
+
+// std
 #include <stdio.h>
 #include <string.h>
-#include "utility.h"
 
 void util_truncate_control_char(char string[])
 {

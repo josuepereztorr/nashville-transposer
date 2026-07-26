@@ -96,14 +96,19 @@ void draw_layout(struct nk_context *ctx)
    to the x and y offset. size_margin subtracts the specified margin values from the width and height values. */
 void draw_container(struct nk_context *ctx, struct nk_rect rec)
 {
+    // gets the rectangle dimensions of the parent group
     struct nk_rect group_rec = nk_window_get_content_region(ctx);
+
+    // adds the function's caller margin
     struct nk_rect margin = nk_rect(group_rec.x + rec.x,
                                     group_rec.y + rec.y,
                                     group_rec.w - rec.w,
                                     group_rec.h - rec.h);
 
+    // get the draw buffer
     struct nk_command_buffer *canvas = nk_window_get_canvas(ctx);
 
+    // draw the rectangle and border
     nk_fill_rect(canvas, margin, ROUNDNESS, NK_FOREGROUND_COLOR);
     nk_stroke_rect(canvas, margin, ROUNDNESS, LINE_THICK, NK_BORDER_COLOR);
 }

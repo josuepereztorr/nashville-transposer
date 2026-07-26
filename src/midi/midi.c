@@ -1,5 +1,7 @@
-#include <stdio.h>
 #include "../midi/midi.h"
+
+// std lib
+#include <stdio.h>
 
 #define MAX_DEVICES 10
 #define MAX_BUFFERED_EVENTS 512

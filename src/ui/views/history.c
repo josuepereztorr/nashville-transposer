@@ -1,7 +1,15 @@
+#include "history.h"
 
+// std lib
+
+// vendor
 #include "../vendor/nuklear.h"
-#include "layout.h"
+
+// shared
 #include "../theme.h"
+
+// views
+#include "layout.h"
 
 void draw_history_container(struct nk_context *ctx)
 {

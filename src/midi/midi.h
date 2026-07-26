@@ -1,6 +1,7 @@
 #ifndef MIDI_H
 #define MIDI_H
 
+// vendor
 #include <portmidi.h>
 
 /* Initializes porMidi and loads all available devices into memory.

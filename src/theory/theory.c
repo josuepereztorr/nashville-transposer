@@ -1,7 +1,11 @@
+#include "theory.h"
+
+// std lib
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "theory.h"
+
+// shared
 #include "../utility/utility.h"
 
 // Specifies the maximum number of notes per the MIDI standard. Ranges from 0-127.

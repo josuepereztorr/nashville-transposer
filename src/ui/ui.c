@@ -65,7 +65,7 @@ static const bool is_blk_note[12] = {
     true,   // A#
     false}; // B
 
-void draw_container(Rectangle rec, float roundness);
+void draw_container_old(Rectangle rec, float roundness);
 int get_wht_note_width(Rectangle rec);
 UINote create_wht_note(int note_index, const Rectangle container);
 void draw_wht_notes(int note_index, Rectangle container);
@@ -95,7 +95,7 @@ void ui_create_containers()
         .width = quarter_width - X_OFFSET_MARGIN,
         .height = half_height_ratio - (Y_OFFSET_MARGIN * 2)};
 
-    draw_container(midi_device_container, CONT_ROUNDNESS_SM);
+    draw_container_old(midi_device_container, CONT_ROUNDNESS_SM);
 
     // SCALE SELECTION
     Rectangle scale_selection_container = {
@@ -104,7 +104,7 @@ void ui_create_containers()
         .width = quarter_width - X_OFFSET_MARGIN,
         .height = half_height_ratio - Y_OFFSET_MARGIN};
 
-    draw_container(scale_selection_container, CONT_ROUNDNESS_SM);
+    draw_container_old(scale_selection_container, CONT_ROUNDNESS_SM);
 
     // TRANSPOSER
     Rectangle transposer_container = {
@@ -113,7 +113,7 @@ void ui_create_containers()
         .width = half_width - X_OFFSET_MARGIN,
         .height = height_ratio - (Y_OFFSET_MARGIN * 2)};
 
-    draw_container(transposer_container, CONT_ROUNDNESS_LG);
+    draw_container_old(transposer_container, CONT_ROUNDNESS_LG);
 
     // HORIZONTAL LINE
     Rectangle transposer_upper_container2 = {
@@ -188,7 +188,7 @@ void ui_create_containers()
         .width = quarter_width - (X_OFFSET_MARGIN * 2),
         .height = height_ratio - (Y_OFFSET_MARGIN * 2)};
 
-    draw_container(history_container, CONT_ROUNDNESS_MD);
+    draw_container_old(history_container, CONT_ROUNDNESS_MD);
 
     // KEYBOARD
     Rectangle keyboard_container = {
@@ -197,7 +197,7 @@ void ui_create_containers()
         .width = screen_width - (X_OFFSET_MARGIN * 2),
         .height = (screen_height * 0.4) - Y_OFFSET_MARGIN};
 
-    draw_container(keyboard_container, CONT_ROUNDNESS_MD);
+    draw_container_old(keyboard_container, CONT_ROUNDNESS_MD);
 
     // draw notes
     int wht_note_index = 0;
@@ -210,7 +210,7 @@ void ui_create_containers()
     draw_blk_notes(wht_note_index, keyboard_container);
 }
 
-void draw_container(Rectangle rec, float roundness)
+void draw_container_old(Rectangle rec, float roundness)
 {
     DrawRectangleRounded(rec,
                          roundness,

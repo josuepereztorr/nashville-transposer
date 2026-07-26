@@ -1,7 +1,15 @@
+#include "keyboard.h"
 
+// std lib
+
+// vendor
 #include "../vendor/nuklear.h"
-#include "layout.h"
+
+// shared
 #include "../theme.h"
+
+// views
+#include "layout.h"
 
 void draw_keyboard_container(struct nk_context *ctx)
 {
