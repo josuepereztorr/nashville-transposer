@@ -4,8 +4,9 @@
 // vendor
 #include "../vendor/nuklear.h"
 
-#define CARD_TITLE_HEIGHT_RATIO 0.20f
-#define DROPDOWN_HEIGHT_RATIO 0.30f
+#define CARD_HEIGHT_RATIO_15 0.15f
+#define CARD_HEIGHT_RATIO_20 0.20f
+#define CARD_HEIGHT_RATIO_30 0.30f
 
 void draw_layout(struct nk_context *ctx);
 struct nk_rect draw_container(struct nk_context *ctx, struct nk_rect rec);

@@ -21,8 +21,6 @@
 #define LOWER_HEIGHT_RATIO 0.4f
 #define QUARTER_WIDTH_RATIO 0.25f
 #define HALF_WIDTH_RATIO 0.5f
-#define DROPDOWN_ROW_TITLE_HEIGHT_RATIO 0.15f
-#define DROPDOWN_ROW_HEIGHT_RATIO 0.15f
 
 // draws the main app containers based on a Nuklear's row/column layout.
 void draw_layout(struct nk_context *ctx)
@@ -121,8 +119,8 @@ struct nk_rect draw_container(struct nk_context *ctx, struct nk_rect rect)
 void draw_dropdown(struct nk_context *ctx, struct nk_rect padding_container, float row_width, const char *title, const char **dropdown_items, int item_count, int *selected)
 {
     // height calculations
-    float title_height = padding_container.h * DROPDOWN_ROW_TITLE_HEIGHT_RATIO;
-    float row_height = padding_container.h * DROPDOWN_ROW_HEIGHT_RATIO;
+    float title_height = padding_container.h * CARD_HEIGHT_RATIO_15;
+    float row_height = padding_container.h * CARD_HEIGHT_RATIO_15;
 
     // creates a label
     draw_title_label(ctx, title, title_height);

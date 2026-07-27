@@ -15,7 +15,7 @@ void draw_scale_selection_container(struct nk_context *ctx)
 {
     // draw card - x and y offsets are relative to the screen.
     struct nk_rect margin_rect = {.x = MARGIN, .y = 0, .w = MARGIN, .h = MARGIN};
-    struct nk_rect container_rect = draw_container(ctx, margin_rect);
+    struct nk_rect relative_container_rect = draw_container(ctx, margin_rect);
 
     // major scales
     const char *major_scales[] = {"C Major", "C# Major",
@@ -30,15 +30,15 @@ void draw_scale_selection_container(struct nk_context *ctx)
 
     // need to use nk_layout_space to create a custom layout inside of my card component
     // no other nk_layout function allows for custom rect's
-    nk_layout_space_begin(ctx, NK_STATIC, container_rect.h, 3);
+    nk_layout_space_begin(ctx, NK_STATIC, relative_container_rect.h, 3);
 
     // NOTE: nk_layout_space_push uses coordinates from the local group, not based on the current screen.
     // the x and y dimensions are relative to margin_rect. We can reuse the card container but we need to convert our coordinates.
-    struct nk_rect absolute_rect = nk_layout_space_rect_to_local(ctx, container_rect);
+    struct nk_rect absolute_rect = nk_layout_space_rect_to_local(ctx, relative_container_rect);
 
     // row ratios based on the card container's height
-    float title_height = absolute_rect.h * CARD_TITLE_HEIGHT_RATIO;
-    float dropdown_height = absolute_rect.h * DROPDOWN_HEIGHT_RATIO;
+    float title_height = absolute_rect.h * CARD_HEIGHT_RATIO_20;
+    float dropdown_height = absolute_rect.h * CARD_HEIGHT_RATIO_30;
 
     // inner container with padding
     struct nk_rect title_pad_rect = {
@@ -49,13 +49,10 @@ void draw_scale_selection_container(struct nk_context *ctx)
 
     // CARD TITLE
     nk_layout_space_push(ctx, title_pad_rect);
-
-    // TITLE 1
     if (nk_group_begin(ctx, "scale_selection_title", NK_WINDOW_NO_SCROLLBAR))
     {
         // title label
         draw_title_label(ctx, "SCALE SELECTION", title_height);
-
         nk_group_end(ctx);
     }
 
