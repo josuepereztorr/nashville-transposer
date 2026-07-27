@@ -4,8 +4,12 @@
 // vendor
 #include "../vendor/nuklear.h"
 
+#define CARD_TITLE_HEIGHT_RATIO 0.20f
+#define DROPDOWN_HEIGHT_RATIO 0.30f
+
 void draw_layout(struct nk_context *ctx);
 struct nk_rect draw_container(struct nk_context *ctx, struct nk_rect rec);
-void draw_dropdown(struct nk_context *ctx, struct nk_rect container, const char *title_str, const char **dropdown_items, int item_count, int *selected);
+void draw_dropdown(struct nk_context *ctx, struct nk_rect container, float row_width, const char *title_str, const char **dropdown_items, int item_count, int *selected);
+void draw_title_label(struct nk_context *ctx, const char *title, float row_height);
 
 #endif

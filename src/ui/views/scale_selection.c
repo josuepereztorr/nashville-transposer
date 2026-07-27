@@ -34,66 +34,63 @@ void draw_scale_selection_container(struct nk_context *ctx)
 
     // NOTE: nk_layout_space_push uses coordinates from the local group, not based on the current screen.
     // the x and y dimensions are relative to margin_rect. We can reuse the card container but we need to convert our coordinates.
-    struct nk_rect local_container_rect = nk_layout_space_rect_to_local(ctx, container_rect);
+    struct nk_rect absolute_rect = nk_layout_space_rect_to_local(ctx, container_rect);
 
     // row ratios based on the card container's height
-    float title_card_ratio = local_container_rect.h * 0.20f;
-    float combo_title_container_ratio = local_container_rect.h * 0.15f;
-    float combo_container_ratio = local_container_rect.h * 0.15f;
-    float drawbox_container_ratio = local_container_rect.h * 0.30f;
+    float title_height = absolute_rect.h * CARD_TITLE_HEIGHT_RATIO;
+    float dropdown_height = absolute_rect.h * DROPDOWN_HEIGHT_RATIO;
 
     // inner container with padding
-    struct nk_rect title_rect = {
-        .x = local_container_rect.x + (MARGIN * 2.0f),
-        .y = local_container_rect.y + MARGIN,
-        .w = local_container_rect.w - (MARGIN * 4.0f),
-        .h = title_card_ratio + MARGIN};
+    struct nk_rect title_pad_rect = {
+        .x = absolute_rect.x + (MARGIN * 2.0f),
+        .y = absolute_rect.y + MARGIN,
+        .w = absolute_rect.w - (MARGIN * 4.0f),
+        .h = title_height + MARGIN};
 
     // CARD TITLE
-    nk_layout_space_push(ctx, title_rect);
+    nk_layout_space_push(ctx, title_pad_rect);
 
     // TITLE 1
     if (nk_group_begin(ctx, "scale_selection_title", NK_WINDOW_NO_SCROLLBAR))
     {
         // title label
-        nk_layout_row_dynamic(ctx, title_card_ratio, 1);
-        nk_label_colored(ctx, "SCALE SELECTION", NK_TEXT_LEFT, NK_PRIMARY_TEXT_COLOR);
+        draw_title_label(ctx, "SCALE SELECTION", title_height);
 
         nk_group_end(ctx);
     }
 
     // CURRENT KEY DROPBOX
-    struct nk_rect current_key_rect = {
-        .x = local_container_rect.x + (MARGIN * 2.0f),
-        .y = local_container_rect.y + title_rect.h,
-        .w = local_container_rect.w - (MARGIN * 4.0f),
-        .h = drawbox_container_ratio};
+    struct nk_rect current_key_pad_rect = {
+        .x = absolute_rect.x + (MARGIN * 2.0f),
+        .y = absolute_rect.y + title_pad_rect.h,
+        .w = absolute_rect.w - (MARGIN * 4.0f),
+        .h = dropdown_height};
 
     static int current_key_selected = 0;
 
-    nk_layout_space_push(ctx, current_key_rect);
+    nk_layout_space_push(ctx, current_key_pad_rect);
 
     if (nk_group_begin(ctx, "current_key", NK_WINDOW_NO_SCROLLBAR))
     {
-        draw_dropdown(ctx, local_container_rect, "Current Key", major_scales, item_count, &current_key_selected);
+        draw_dropdown(ctx, absolute_rect, current_key_pad_rect.w, "Current Key", major_scales, item_count, &current_key_selected);
         nk_group_end(ctx);
     }
 
     // TARGET KEY DROPBOX
-    struct nk_rect target_key_rect = {
-        .x = local_container_rect.x + (MARGIN * 2.0f),
-        .y = local_container_rect.y + title_rect.h + current_key_rect.h,
-        .w = local_container_rect.w - (MARGIN * 4.0f),
-        .h = drawbox_container_ratio};
+    struct nk_rect target_key_pad_rect = {
+        .x = absolute_rect.x + (MARGIN * 2.0f),
+        .y = absolute_rect.y + title_pad_rect.h + current_key_pad_rect.h,
+        .w = absolute_rect.w - (MARGIN * 4.0f),
+        .h = dropdown_height};
 
-    nk_layout_space_push(ctx, target_key_rect);
+    nk_layout_space_push(ctx, target_key_pad_rect);
 
     static int target_key_selected = 0;
 
     if (nk_group_begin(ctx, "target_key", NK_WINDOW_NO_SCROLLBAR))
     {
         // creates a dropbox with title
-        draw_dropdown(ctx, local_container_rect, "Target Key", major_scales, item_count, &target_key_selected);
+        draw_dropdown(ctx, absolute_rect, target_key_pad_rect.w, "Target Key", major_scales, item_count, &target_key_selected);
         nk_group_end(ctx);
     }
 

@@ -21,8 +21,8 @@
 #define LOWER_HEIGHT_RATIO 0.4f
 #define QUARTER_WIDTH_RATIO 0.25f
 #define HALF_WIDTH_RATIO 0.5f
-#define ROW_TITLE_HEIGHT_RATIO 0.15f
-#define ROW_HEIGHT_RATIO 0.15f
+#define DROPDOWN_ROW_TITLE_HEIGHT_RATIO 0.15f
+#define DROPDOWN_ROW_HEIGHT_RATIO 0.15f
 
 // draws the main app containers based on a Nuklear's row/column layout.
 void draw_layout(struct nk_context *ctx)
@@ -117,22 +117,28 @@ struct nk_rect draw_container(struct nk_context *ctx, struct nk_rect rect)
     return rect_add_margin;
 }
 
-void draw_dropdown(struct nk_context *ctx, struct nk_rect padding_container, const char *title_str, const char **dropdown_items, int item_count, int *selected)
+// creates a dropdown box (nk_combo) with a title (nk_label_colored). padding_container is used to calculate the height based on the usable area.
+void draw_dropdown(struct nk_context *ctx, struct nk_rect padding_container, float row_width, const char *title, const char **dropdown_items, int item_count, int *selected)
 {
-    // calculations
-    float title_height = padding_container.h * ROW_TITLE_HEIGHT_RATIO;
-    float row_height = padding_container.h * ROW_HEIGHT_RATIO;
+    // height calculations
+    float title_height = padding_container.h * DROPDOWN_ROW_TITLE_HEIGHT_RATIO;
+    float row_height = padding_container.h * DROPDOWN_ROW_HEIGHT_RATIO;
 
     // creates a label
-    nk_layout_row_dynamic(ctx, title_height, 1);
-    nk_label_colored(ctx, title_str, NK_TEXT_LEFT, NK_PRIMARY_TEXT_COLOR);
+    draw_title_label(ctx, title, title_height);
 
     // the size of each row when the dropbox is expanded
     struct nk_vec2 expanded_row_size = {
-        .x = padding_container.w,
+        .x = row_width, // this value is based on the dropdown box's padding containers
         .y = row_height * item_count};
 
     // creates a dropdown box
     nk_layout_row_dynamic(ctx, row_height, 1);
     *selected = nk_combo(ctx, dropdown_items, item_count, *selected, (int)row_height, expanded_row_size);
+}
+
+void draw_title_label(struct nk_context *ctx, const char *title, float row_height)
+{
+    nk_layout_row_dynamic(ctx, row_height, 1);
+    nk_label_colored(ctx, title, NK_TEXT_LEFT, NK_PRIMARY_TEXT_COLOR);
 }
