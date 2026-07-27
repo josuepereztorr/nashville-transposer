@@ -1,6 +1,21 @@
 #ifndef THEORY_H
 #define THEORY_H
 
+typedef struct
+{
+      int status;
+      int note;
+      char name[10];
+      int octave;
+} Note;
+
+typedef struct
+{
+      const char *current_note;
+      const char *target_note;
+      const char *nashville_num;
+} NoteResult;
+
 /* Parses the provided row into a Note and loads it into keyboard[]. */
 int theory_row_parser(char string[]);
 

@@ -11,14 +11,6 @@
 // Specifies the maximum number of notes per the MIDI standard. Ranges from 0-127.
 #define MAX_MIDI_NOTES 128
 
-typedef struct
-{
-    int status;
-    int note;
-    char name[10];
-    int octave;
-} Note;
-
 // Stores the full range of notes (0-127) as Note structs.
 Note keyboard[MAX_MIDI_NOTES] = {0};
 
