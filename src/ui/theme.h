@@ -22,7 +22,7 @@
 #define NK_DEGREE_COLOR nk_rgba(151, 133, 234, 255)
 #define NK_TARGET_COLOR nk_rgba(59, 125, 237, 255)
 
-// other
+// Shared
 #define MARGIN 20.0f
 #define ROUNDNESS 10.0f
 #define LINE_THICK 1.25f

@@ -82,7 +82,7 @@ int main()
     /* ----------------------------------------------------------------------------------------------------------*/
     // RAYLIB
     struct nk_context *ctx = app_init(0);
-    Vector2 monitor_size = get_monitor_dimensions();
+    struct nk_vec2 monitor_size = get_monitor_dimensions();
 
     if (ctx == NULL)
     {
@@ -109,7 +109,7 @@ int main()
         nk_end(ctx);
 
         BeginDrawing();
-        ClearBackground(BLACK); // note: this is just a fallback color. the background color is set in app_init().
+        ClearBackground(RL_FILL_COLOR); // note: this is just a fallback color. the background color is set in app_init().
         DrawNuklear(ctx);
         EndDrawing();
     }

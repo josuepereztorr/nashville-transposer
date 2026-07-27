@@ -18,7 +18,7 @@ struct nk_context *app_init(int font_size)
 {
     // initializes a window and OpenGL context. Set's up a temporary 1x1 window.
     InitWindow(1, 1, UI_NAME);
-    Vector2 monitor_dimensions = get_monitor_dimensions();
+    struct nk_vec2 monitor_dimensions = get_monitor_dimensions();
 
     // resizes the current window to the monitor dimensions and toggles fullscreen mode.
     SetWindowSize(monitor_dimensions.x, monitor_dimensions.y);
@@ -33,7 +33,7 @@ struct nk_context *app_init(int font_size)
     }
 
     // sets up global theme properties
-    ctx->style.window.fixed_background = nk_style_item_color(NK_FILL_COLOR);
+    ctx->style.window.fixed_background = nk_style_item_color(NK_TRANSPARENT);
     ctx->style.window.spacing = nk_vec2(0, 0);
     ctx->style.window.padding = nk_vec2(0, 0);
     ctx->style.window.group_padding = nk_vec2(0, 0);
@@ -42,11 +42,11 @@ struct nk_context *app_init(int font_size)
 }
 
 // returns the current monitor's dimensions
-Vector2 get_monitor_dimensions()
+struct nk_vec2 get_monitor_dimensions()
 {
     // returns the index of the current monitor where the window is placed and gets the current monitor dimensions.
     int monitor = GetCurrentMonitor();
-    return (Vector2){
+    return (struct nk_vec2){
         .x = (float)GetMonitorWidth(monitor),
         .y = (float)GetMonitorHeight(monitor)};
 }

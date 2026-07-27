@@ -6,6 +6,6 @@
 #include "ui/vendor/nuklear.h"
 
 struct nk_context *app_init(int font_size);
-Vector2 get_monitor_dimensions();
+struct nk_vec2 get_monitor_dimensions();
 
 #endif
