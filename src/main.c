@@ -51,11 +51,25 @@ int main()
     int num_of_devices = midi_initialize();
 
     // do i really want to end my program? loop?
-    // if (num_of_devices == 0)
-    // {
-    //     printf("main: no devices found\n");
-    //     return 1;
-    // }
+    if (num_of_devices == 0)
+    {
+        printf("main: no devices found\n");
+        return 1;
+    }
+
+    // get devices, read only
+    const MidiDevice *devices = midi_get_devices();
+
+    if (devices == NULL)
+    {
+        printf("ERRRRROR: devices are null");
+    }
+
+    // init devices
+    AppContext app_ctx = {0};
+    app_ctx.connected_devices = &(ConnectedDevices){
+        .count = num_of_devices,
+        .devices = devices};
 
     // // Connect to a MIDI device
     // PmError error = midi_connect_device();
@@ -63,6 +77,8 @@ int main()
     // {
     //     fprintf(stderr, "Pm_OpenInput failed: %d\n ", error);
     // }
+
+    // create a function that auto selects the first device id
 
     // Read from MIDI Device
     // error = midi_read(external);
@@ -94,17 +110,21 @@ int main()
     // checks for ESC or window closed.
     while (!WindowShouldClose())
     {
+
         // check for state change
         UpdateNuklear(ctx);
 
-        // need to refactor into Nuklear views
+        // check devices connected
+        app_ctx.connected_devices->count = midi_refresh();
+        app_ctx.connected_devices->devices = midi_get_devices();
+
         // ui_create_containers();
 
         // describes the ui
         if (nk_begin(ctx, "main", nk_rect(0, 0, monitor_size.x, monitor_size.y), NK_WINDOW_NO_SCROLLBAR))
         {
             // app layout
-            draw_layout(ctx);
+            draw_layout(ctx, &app_ctx);
         }
         nk_end(ctx);
 

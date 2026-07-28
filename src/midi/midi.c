@@ -3,22 +3,16 @@
 // std lib
 #include <stdio.h>
 
-#define MAX_DEVICES 10
 #define MAX_BUFFERED_EVENTS 512
 
-typedef struct
-{
-    int id;
-    const PmDeviceInfo *device_info;
-} MidiDevice;
-
 // stores all devices (inputs and outputs)
-MidiDevice devices[MAX_DEVICES] = {0};
+static MidiDevice devices[MAX_DEVICES] = {0};
+
+// shows the number of available input devices
+static int input_device_count = 0;
 
 // Represents an open midi connection to the selected midi device
 PortMidiStream *stream = NULL;
-
-int device_count = 0;
 
 static void add_devices(int num_of_devices);
 static int select_device();
@@ -46,7 +40,22 @@ int midi_initialize()
 
     add_devices(num_of_devices);
 
-    return num_of_devices;
+    // return the available midi inputs
+    return input_device_count;
+}
+
+int midi_refresh()
+{
+    // terminates the previous instance of Pm_Initialize(), closes resources.
+    PmError error = Pm_Terminate();
+
+    if (error != pmNoError)
+    {
+        return error;
+    }
+
+    // start a new instance and return
+    return midi_initialize();
 }
 
 PmError midi_terminate()
@@ -95,6 +104,15 @@ PmError midi_connect_device()
     return pmNoError;
 }
 
+const MidiDevice *midi_get_devices()
+{
+    return devices;
+}
+
+// PmError midi_connect_default_device()
+// {
+// }
+
 PmError midi_read(void (*external_function)())
 {
     PmEvent event_buffer[1] = {};
@@ -131,6 +149,7 @@ PmError midi_read(void (*external_function)())
 // Adds PmDeviceInfo structs to devices[], filtered by input devices.
 static void add_devices(int num_of_devices)
 {
+    input_device_count = 0;
     for (int device = 0; device < num_of_devices; device++)
     {
         // Pm_GetDeviceInfo - takes an id as a parameter and returns a pointer to a PmDeviceInfo struct
@@ -147,8 +166,13 @@ static void add_devices(int num_of_devices)
             // add to MidiDevice array
             devices[device].id = device;
             devices[device].device_info = device_info;
-            device_count++;
+            input_device_count++;
         }
+
+        // add to MidiDevice array
+        // devices[device].id = device;
+        // devices[device].device_info = device_info;
+        // device_count++;
     }
 }
 
@@ -166,11 +190,11 @@ static int select_device()
         // ger user input
         scanf("%d", &selected_id);
 
-        for (int i = 0; i < device_count; i++)
+        for (int i = 0; i < input_device_count; i++)
         {
             // check if id is within bounds
             // TODO - find better filtering method
-            if (selected_id < 0 || selected_id > device_count)
+            if (selected_id < 0 || selected_id > input_device_count)
             {
                 printf("id is out of range\n");
                 break;
@@ -195,7 +219,28 @@ static void print_devices()
     // print devices structs
     printf("Avilable Devices: \n");
 
-    for (int i = 0; i < device_count; i++)
+    for (int i = 0; i < input_device_count; i++)
+    {
+        printf("Id: %d\n", devices[i].id);
+        printf("Name: %s\n", devices[i].device_info->name);
+
+        if (devices[i].device_info->input)
+        {
+            printf("Type: Input\n\n");
+            continue;
+        }
+
+        printf("Type: Output\n\n");
+        continue;
+    };
+}
+
+void print_devices_arr(const MidiDevice devices[])
+{
+    // print devices structs
+    printf("Avilable Devices: \n");
+
+    for (int i = 0; i < input_device_count; i++)
     {
         printf("Id: %d\n", devices[i].id);
         printf("Name: %s\n", devices[i].device_info->name);

@@ -4,6 +4,9 @@
 // vendor
 #include "../vendor/nuklear.h"
 
-void draw_midi_device_container(struct nk_context *ctx);
+// shared
+#include "../../app_init.h"
+
+void draw_midi_device_container(struct nk_context *ctx, AppContext *app_ctx);
 
 #endif

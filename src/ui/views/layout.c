@@ -9,6 +9,7 @@
 // shared
 #include "../../app_init.h"
 #include "../theme.h"
+#include "../../midi/midi.h"
 
 // views
 #include "midi_device.h"
@@ -23,7 +24,7 @@
 #define HALF_WIDTH_RATIO 0.5f
 
 // draws the main app containers based on a Nuklear's row/column layout.
-void draw_layout(struct nk_context *ctx)
+void draw_layout(struct nk_context *ctx, AppContext *app_ctx)
 {
     // get the screen size and spit it up into ratio of 60/40
     struct nk_vec2 monitor_size = get_monitor_dimensions();
@@ -49,7 +50,7 @@ void draw_layout(struct nk_context *ctx)
         nk_layout_row_dynamic(ctx, half_height, 1);
         if (nk_group_begin(ctx, "midi_device", NK_WINDOW_NO_SCROLLBAR))
         {
-            draw_midi_device_container(ctx);
+            draw_midi_device_container(ctx, app_ctx);
             nk_group_end(ctx);
         }
 

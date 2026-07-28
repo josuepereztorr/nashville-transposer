@@ -2,7 +2,10 @@
 #include <stdio.h>
 
 // vendor
+#define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_DEFAULT_FONT
 #include "raylib.h"
+#include "ui/vendor/nuklear.h"
 #include "ui/vendor/raylib-nuklear.h"
 
 // shared
@@ -24,15 +27,18 @@ struct nk_context *app_init(int font_size)
     SetWindowSize(monitor_dimensions.x, monitor_dimensions.y);
     ToggleFullscreen();
 
+    // *filename is relative to the project root directory
+    Font font = LoadFontEx("assets/fonts/inter/Inter_18pt-Regular.ttf", 18.0f, NULL, 0);
+
     // initializes the Nuklear context for use with Raylib. Loads the default font and sets up GL resources.
-    struct nk_context *ctx = InitNuklear(font_size);
+    struct nk_context *ctx = InitNuklearEx(font, 18.0f);
 
     if (ctx == NULL)
     {
         return NULL;
     }
 
-    // sets up global theme properties
+    // global parameters
     ctx->style.window.fixed_background = nk_style_item_color(NK_TRANSPARENT);
     ctx->style.window.spacing = nk_vec2(0, 0);
     ctx->style.window.padding = nk_vec2(0, 0);
