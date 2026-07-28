@@ -2,11 +2,11 @@
 #define LAYOUT_H
 
 // vendor
-#include "../vendor/nuklear.h"
-#include "../../midi/midi.h"
+#include "../vendor/raylib-nuklear.h"
 
 // shared
 #include "../../app_init.h"
+#include "../../midi/midi.h"
 
 #define CARD_HEIGHT_RATIO_15 0.15f
 #define CARD_HEIGHT_RATIO_20 0.20f

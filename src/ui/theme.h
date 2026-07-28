@@ -3,7 +3,7 @@
 
 // vendor
 #include "raylib.h"
-#include "vendor/nuklear.h"
+#include "vendor/raylib-nuklear.h"
 
 // Raylib colors
 #define RL_FILL_COLOR (Color){18, 20, 28, 255}

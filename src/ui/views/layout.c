@@ -1,9 +1,10 @@
 #include "layout.h"
 
 // std lib
+#include <stdio.h>
 
 // vendor
-#include "../vendor/nuklear.h"
+#include "../vendor/raylib-nuklear.h"
 #include "raylib.h"
 
 // shared

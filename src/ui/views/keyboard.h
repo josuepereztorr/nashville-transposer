@@ -2,7 +2,7 @@
 #define KEYBOARD_H
 
 // vendors
-#include "../vendor/nuklear.h"
+#include "../vendor/raylib-nuklear.h"
 
 void draw_keyboard_container(struct nk_context *ctx);
 

@@ -7,8 +7,7 @@
 
 // shared
 #include "app_init.h"
-#include "csv_reader/csv_reader.h"
-#include "theory/theory.h"
+
 #include "midi/midi.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -17,59 +16,26 @@
 #include "ui/views/history.h"
 #include "ui/views/layout.h"
 
-// CSV
-#define CSV_DATA_PATH "./data/midi_notes.csv"
+AppContext *app_ctx = NULL;
+struct nk_context *ui_ctx = NULL;
 
 int main()
 {
     // buffering set to unbuffered
     setbuf(stdout, NULL);
 
-    // get data from csv
-    char rows[CSV_MAX_ROWS][CSV_MAX_BUFFER_SIZE] = {};
-    int rows_read = csv_read(CSV_DATA_PATH, rows);
+    // init app
+    int error = app_init();
 
-    if (rows_read < 0)
+    if (error != 0)
     {
-        fprintf(stderr, "csv_read: failed to load data from '%s' or there was an error during reading\n", CSV_DATA_PATH);
+        // failure
         return 1;
     }
 
-    // parse and load data into memory
-    for (int row = 0; row < rows_read; row++)
-    {
-        int error = theory_row_parser(rows[row]);
-
-        if (error < 0)
-        {
-            fprintf(stderr, "theory_row_parser: failed to parse the string\n");
-            return 1;
-        }
-    }
-
-    // start portMidi and search for devices.
-    int num_of_devices = midi_initialize();
-
-    // do i really want to end my program? loop?
-    if (num_of_devices == 0)
-    {
-        printf("main: no devices found\n");
-        return 1;
-    }
-
-    // get devices, read only
-    const MidiDevice *devices = midi_get_devices();
-
-    if (devices == NULL)
-    {
-        printf("ERRRRROR: devices are null");
-    }
-
-    // init devices
-    AppContext app_ctx = {0};
-    app_ctx.connected_devices = &(ConnectedDevices){
-        .count = num_of_devices,
-        .devices = devices};
+    // get contexts
+    app_ctx = app_get_context();
+    ui_ctx = app_get_ui_context();
 
     // // Connect to a MIDI device
     // PmError error = midi_connect_device();
@@ -95,47 +61,37 @@ int main()
     //     fprintf(stderr, "midi_terminate failed: %d\n ", error);
     // }
 
-    /* ----------------------------------------------------------------------------------------------------------*/
-    // RAYLIB
-    struct nk_context *ctx = app_init(0);
+    SetTargetFPS(60);
+    // returns the current monitor's dimensions
     struct nk_vec2 monitor_size = get_monitor_dimensions();
-
-    if (ctx == NULL)
-    {
-        fprintf(stderr, "Failed to initialize the UI context.");
-        CloseWindow();
-        return 1;
-    }
 
     // checks for ESC or window closed.
     while (!WindowShouldClose())
     {
-
-        // check for state change
-        UpdateNuklear(ctx);
-
-        // check devices connected
-        app_ctx.connected_devices->count = midi_refresh();
-        app_ctx.connected_devices->devices = midi_get_devices();
+        // actively checks (polls) raylib's live state and forwards it to Nuklear (ui library)
+        UpdateNuklear(ui_ctx);
 
         // ui_create_containers();
 
+        // window size
+        struct nk_rect window_size = nk_rect(0, 0, monitor_size.x, monitor_size.y);
+
         // describes the ui
-        if (nk_begin(ctx, "main", nk_rect(0, 0, monitor_size.x, monitor_size.y), NK_WINDOW_NO_SCROLLBAR))
+        if (nk_begin(ui_ctx, "main", window_size, NK_WINDOW_NO_SCROLLBAR))
         {
             // app layout
-            draw_layout(ctx, &app_ctx);
+            draw_layout(ui_ctx, app_ctx);
         }
-        nk_end(ctx);
+        nk_end(ui_ctx);
 
         BeginDrawing();
         ClearBackground(RL_FILL_COLOR); // note: this is just a fallback color. the background color is set in app_init().
-        DrawNuklear(ctx);
+        DrawNuklear(ui_ctx);
         EndDrawing();
     }
 
     // release resources
-    UnloadNuklear(ctx);
+    UnloadNuklear(ui_ctx);
     CloseWindow();
 
     /* ----------------------------------------------------------------------------------------------------------*/

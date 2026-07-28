@@ -2,7 +2,7 @@
 #define MIDI_DEVICE_H
 
 // vendor
-#include "../vendor/nuklear.h"
+#include "../vendor/raylib-nuklear.h"
 
 // shared
 #include "../../app_init.h"

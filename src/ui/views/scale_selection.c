@@ -3,7 +3,7 @@
 // std lib
 
 // vendor
-#include "../vendor/nuklear.h"
+#include "../vendor/raylib-nuklear.h"
 
 // shared
 #include "../theme.h"

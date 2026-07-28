@@ -1,64 +1,175 @@
+/*
+ * ============================================================
+ * File    : midi.c
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description :
+ *      Manages device discovery through the PortMidi API.
+ * ============================================================
+ * Dependencies:
+ *      portmidi.h (brew) - handles MIDI devices into I/O.
+ * ============================================================
+ */
+
+// ─────────────────────────────────────────────────────
+// INCLUDES
+// ─────────────────────────────────────────────────────
+
+// file header
 #include "../midi/midi.h"
 
-// std lib
+// standard library
 #include <stdio.h>
+#include <string.h>
+
+// vendor
+#include <portmidi.h>
+
+// ─────────────────────────────────────────────────────
+// CONSTANT & MACROS
+// ─────────────────────────────────────────────────────
 
 #define MAX_BUFFERED_EVENTS 512
 
-// stores all devices (inputs and outputs)
+// ─────────────────────────────────────────────────────
+// TYPE DEFINITIONS
+// ─────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────
+// PRIVATE VARIABLES
+// ─────────────────────────────────────────────────────
+
+// responsible for holding the devices array and it's size.
+static ConnectedDevices conn_devices = {0};
+
+// stores all connected input devices
 static MidiDevice devices[MAX_DEVICES] = {0};
 
 // shows the number of available input devices
 static int input_device_count = 0;
 
 // Represents an open midi connection to the selected midi device
-PortMidiStream *stream = NULL;
+static PortMidiStream *stream = NULL;
+
+// ─────────────────────────────────────────────────────
+// PRIVATE FUNCTION PROTOTYPES
+// ─────────────────────────────────────────────────────
 
 static void add_devices(int num_of_devices);
-static int select_device();
 static void print_buffer(PmEvent buffer[]);
-static void print_devices();
+static void print_devices(void);
+static void print_devices_arr(const MidiDevice devices[]);
 
-int midi_initialize()
+// ─────────────────────────────────────────────────────
+// PUBLIC FUNCTIONS
+// ─────────────────────────────────────────────────────
+
+/* Initializes PortMidi and loads all available devices into memory.
+   Returns the number of devices found. */
+int midi_initialize(void)
 {
     /* PortMidi is designed to support multiple interfaces (such as  ALSA, CoreMIDI and WinMM).
     It is possible to return pmNoError because there are no supported interfaces. In that case,
     zero devices will be available.*/
     PmError error = Pm_Initialize();
 
-    printf("midi_initialize: init successful\n");
+    // fprintf(stderr, "DEBUG: midi_initialize: init successful\n");
 
     // total number of devices (virtual/hardwired)
     int num_of_devices = Pm_CountDevices();
-
     if (num_of_devices == 0)
     {
         return 0;
     }
 
-    printf("midi_initialize: %i midi devices found\n", num_of_devices);
+    // fprintf(stderr, "DEBUG: midi_initialize: %i midi devices found\n", num_of_devices);
 
+    // adds PmDeviceInfo structs to the devices array, filtered by input devices.
     add_devices(num_of_devices);
 
-    // return the available midi inputs
-    return input_device_count;
+    // init data
+    conn_devices.count = input_device_count;
+    conn_devices.devices = devices;
+
+    // return all the available midi inputs
+    return num_of_devices;
 }
 
-int midi_refresh()
+/* Terminates the previous instance of PortMidi, clears the data from connected devices, and then calls midi_initialize().
+   Returns the number of devices found.*/
+int midi_refresh(void)
 {
     // terminates the previous instance of Pm_Initialize(), closes resources.
     PmError error = Pm_Terminate();
-
     if (error != pmNoError)
     {
         return error;
     }
 
-    // start a new instance and return
+    // clear data
+    memset(&conn_devices, 0, sizeof(conn_devices));
+    memset(devices, 0, sizeof(devices));
+    input_device_count = 0;
+
+    // start a new instance and returns the number of devices found.
     return midi_initialize();
 }
 
-PmError midi_terminate()
+// Opens a MIDI device for input. Returns pmNoError or a nonzero int (PmError) for a failed connection.
+PmError midi_connect_device(int id)
+{
+    // Pm_OpenInput requires: PortMidiStream, PmDeviceId, bufferSize
+    PmError error = Pm_OpenInput(&stream, id, NULL, MAX_BUFFERED_EVENTS, NULL, NULL);
+
+    if (error != pmNoError)
+    {
+        // connection to midi device failed
+        return error;
+    };
+
+    const PmDeviceInfo *selected_device = Pm_GetDeviceInfo(id);
+
+    if (selected_device != NULL)
+    {
+        printf("midi_connect_device: %s connection opened to '%s'\n", selected_device->input ? "INPUT" : "OUTPUT", selected_device->name);
+    }
+    else
+    {
+        fprintf(stderr, "Pm_GetDeviceInfo is NULL: pointer for selected_device is out of range or was deleted\n");
+    }
+    return pmNoError;
+}
+
+PmError midi_read(void)
+{
+    PmEvent event_buffer[1] = {0};
+    int events_per_read = 1;
+
+    printf("midi_read: ready to read\n");
+
+    // TODO - Find a way to gracefully recover
+    while (1)
+    {
+
+        // returns the number of PmEvents read or a PmError
+        PmError error = Pm_Read(stream, event_buffer, events_per_read);
+
+        if (error < 0)
+        {
+            // PmError value will be returned
+            return error;
+        }
+    }
+
+    return pmNoError;
+}
+
+PmError midi_terminate(void)
 {
     PmError error = Pm_Close(stream);
 
@@ -77,74 +188,9 @@ PmError midi_terminate()
     return pmNoError;
 }
 
-PmError midi_connect_device()
-{
-    // only valid for terminal application
-    int selected_id = select_device();
-
-    // Pm_OpenInput requires: PortMidiStream, PmDeviceId, bufferSize
-    PmError error = Pm_OpenInput(&stream, selected_id, NULL, MAX_BUFFERED_EVENTS, NULL, NULL);
-
-    if (error != pmNoError)
-    {
-        // connection to midi device failed
-        return error;
-    };
-
-    const PmDeviceInfo *selected_device = Pm_GetDeviceInfo(selected_id);
-
-    if (selected_device != NULL)
-    {
-        printf("midi_connect_device: %s connection opened to '%s'\n", selected_device->input ? "INPUT" : "OUTPUT", selected_device->name);
-    }
-    else
-    {
-        fprintf(stderr, "Pm_GetDeviceInfo is NULL: pointer for selected_device is out of range or was deleted\n");
-    }
-    return pmNoError;
-}
-
-const MidiDevice *midi_get_devices()
-{
-    return devices;
-}
-
-// PmError midi_connect_default_device()
-// {
-// }
-
-PmError midi_read(void (*external_function)())
-{
-    PmEvent event_buffer[1] = {};
-    int events_per_read = 1;
-
-    printf("midi_read: ready to read\n");
-
-    // TODO - Find a way to gracefully recover
-    while (1)
-    {
-
-        // returns the number of PmEvents read or a PmError
-        PmError error = Pm_Read(stream, event_buffer, events_per_read);
-
-        if (error < 0)
-        {
-            // PmError value will be returned
-            return error;
-        }
-
-        // UI, or other program logic
-        // update UI to show key pressed
-        // do logic to compare midi key
-
-        if (external_function != NULL)
-        {
-            external_function();
-        }
-    }
-
-    return pmNoError;
-}
+// ─────────────────────────────────────────────────────
+// PRIVATE FUNCTIONS
+// ─────────────────────────────────────────────────────
 
 // Adds PmDeviceInfo structs to devices[], filtered by input devices.
 static void add_devices(int num_of_devices)
@@ -164,57 +210,28 @@ static void add_devices(int num_of_devices)
         if (device_info->input)
         {
             // add to MidiDevice array
-            devices[device].id = device;
-            devices[device].device_info = device_info;
+            devices[input_device_count].id = device;
+            devices[input_device_count].device_info = device_info;
             input_device_count++;
         }
-
-        // add to MidiDevice array
-        // devices[device].id = device;
-        // devices[device].device_info = device_info;
-        // device_count++;
     }
 }
 
-// Prints to the console and asks the user for an id. Returns an id.
-static int select_device()
+// ─────────────────────────────────────────────────────
+// ACCESSORS
+// ─────────────────────────────────────────────────────
+
+ConnectedDevices *midi_get_connected_devices(void)
 {
-    // select a midi connection
-    printf("Select a midi device: ");
-
-    int selected_id = -1;
-    int is_valid = 0;
-
-    while (!is_valid)
-    {
-        // ger user input
-        scanf("%d", &selected_id);
-
-        for (int i = 0; i < input_device_count; i++)
-        {
-            // check if id is within bounds
-            // TODO - find better filtering method
-            if (selected_id < 0 || selected_id > input_device_count)
-            {
-                printf("id is out of range\n");
-                break;
-            }
-
-            // check if selected_id matches device id
-            if (devices[i].id == selected_id)
-            {
-                is_valid = 1;
-                break;
-            }
-            continue;
-        }
-    }
-    // printf("You have selected %d\n", selected_id);
-    return selected_id;
+    return &conn_devices;
 }
+
+// ─────────────────────────────────────────────────────
+// DEBUG PRINTING
+// ─────────────────────────────────────────────────────
 
 // Prints to the console a list of devices with their id, name, and type
-static void print_devices()
+static void print_devices(void)
 {
     // print devices structs
     printf("Avilable Devices: \n");
@@ -235,7 +252,7 @@ static void print_devices()
     };
 }
 
-void print_devices_arr(const MidiDevice devices[])
+static void print_devices_arr(const MidiDevice devices[])
 {
     // print devices structs
     printf("Avilable Devices: \n");
