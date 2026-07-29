@@ -15,7 +15,7 @@ void draw_scale_selection_container(struct nk_context *ctx)
 {
     // draw card - x and y offsets are relative to the screen.
     struct nk_rect margin_rect = {.x = MARGIN, .y = 0, .w = MARGIN, .h = MARGIN};
-    struct nk_rect relative_container_rect = draw_container(ctx, margin_rect);
+    struct nk_rect relative_container_rect = draw_container(ctx, margin_rect, NK_FOREGROUND_COLOR, NK_BORDER_COLOR);
 
     // major scales
     const char *major_scales[] = {"C Major", "C# Major",

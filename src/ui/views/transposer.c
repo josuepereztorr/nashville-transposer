@@ -15,7 +15,7 @@
 void draw_transposer_container(struct nk_context *ctx)
 {
     struct nk_rect margin_rec = {.x = MARGIN, .y = MARGIN, .w = MARGIN, .h = MARGIN * 2.0f};
-    struct nk_rect relative_container_rect = draw_container(ctx, margin_rec);
+    struct nk_rect relative_container_rect = draw_container(ctx, margin_rec, NK_FOREGROUND_COLOR, NK_BORDER_COLOR);
 
     nk_layout_space_begin(ctx, NK_STATIC, relative_container_rect.h, 2);
 

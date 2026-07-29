@@ -8,134 +8,69 @@
 
 // shared
 #include "../theme.h"
-#include "../../app_init.h"
+#include "../../app.h"
 #include "../../midi/midi.h"
 
 // views
 #include "layout.h"
 
-void draw_midi_device_container(struct nk_context *ctx, AppContext *app_ctx)
+void draw_midi_device_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 {
-    struct nk_rect margin_rec = {.x = MARGIN, .y = MARGIN, .w = MARGIN, .h = MARGIN * 2.0f};
-    struct nk_rect relative_container_rect = draw_container(ctx, margin_rec);
+    struct nk_rect margin_rec = {.x = MARGIN, .y = MARGIN, .w = MARGIN * 2.0f, .h = MARGIN * 2.0f};
+    struct nk_rect relative_container_rect = draw_container(ui_ctx, margin_rec, NK_FOREGROUND_COLOR, NK_BORDER_COLOR);
 
-    // devices - TODO: NEED A FUNCTION CALL TO THE CURRENT ACTIVE DEVICES
-    const char *devices[MAX_DEVICES] = {0};
-
-    for (int i = 0; i < app_ctx->connected_devices->count; i++)
-    {
-        devices[i] = app_ctx->connected_devices->devices[i].device_info->name;
-    }
-
-    // item count
-    // int item_count = sizeof(devices) / sizeof(devices[0]);
-
-    nk_layout_space_begin(ctx, NK_STATIC, relative_container_rect.h, 4);
+    nk_layout_space_begin(ui_ctx, NK_STATIC, relative_container_rect.h, 2);
 
     // NOTE: nk_layout_space_push uses coordinates from the local group, not based on the current screen.
     // the x and y dimensions are relative to margin_rect. We can reuse the card container but we need to convert our coordinates.
-    struct nk_rect absolute_rect = nk_layout_space_rect_to_local(ctx, relative_container_rect);
+    struct nk_rect absolute_rect = nk_layout_space_rect_to_local(ui_ctx, relative_container_rect);
 
     // row ratios based on the card container's height
     float title_height = absolute_rect.h * CARD_HEIGHT_RATIO_20;
-    float dropdown_height = absolute_rect.h * CARD_HEIGHT_RATIO_30;
+    float x_padding = (MARGIN * 2.0f);
+    float w_padding = (MARGIN * 6.0f);
 
     // CARD TITLE
     // inner container with padding
     struct nk_rect title_pad_rect = {
-        .x = absolute_rect.x + (MARGIN * 2.0f),
+        .x = absolute_rect.x + x_padding,
         .y = absolute_rect.y + MARGIN,
-        .w = absolute_rect.w - (MARGIN * 4.0f),
+        .w = absolute_rect.w - w_padding,
         .h = title_height};
 
-    nk_layout_space_push(ctx, title_pad_rect);
-    if (nk_group_begin(ctx, "midi_device_title", NK_WINDOW_NO_SCROLLBAR))
+    nk_layout_space_push(ui_ctx, title_pad_rect);
+    if (nk_group_begin(ui_ctx, "midi_device_title", NK_WINDOW_NO_SCROLLBAR))
     {
         // title label
-        draw_title_label(ctx, "MIDI DEVICE", title_height);
-        nk_group_end(ctx);
+        draw_title_label(ui_ctx, "MIDI DEVICE", title_height);
+        nk_group_end(ui_ctx);
     }
 
-    // DEVICE SELECTION DROPBOX
-    struct nk_rect device_pad_rect = {
-        .x = absolute_rect.x + (MARGIN * 2.0f),
-        .y = absolute_rect.y + title_pad_rect.h,
-        .w = absolute_rect.w - (MARGIN * 4.0f),
-        .h = dropdown_height};
-
-    static int device_selected = 0;
-
-    nk_layout_space_push(ctx, device_pad_rect);
-
-    if (nk_group_begin(ctx, "device_dropdown", NK_WINDOW_NO_SCROLLBAR))
-    {
-        draw_dropdown(ctx, absolute_rect, device_pad_rect.w, "Device", devices, app_ctx->connected_devices->count, &device_selected);
-        nk_group_end(ctx);
-    }
-
-    // IS CONNECTED LABEL
-    struct nk_rect connected_pad_rect = {
-        .x = absolute_rect.x + (MARGIN * 2.0f),
-        .y = absolute_rect.y + title_pad_rect.h + device_pad_rect.h + MARGIN,
-        .w = absolute_rect.w - (MARGIN * 4.0f),
-        .h = absolute_rect.h * 0.15};
+    // CONNECTED LABEL
+    struct nk_rect info_pad_rect = {
+        .x = absolute_rect.x + x_padding,
+        .y = title_pad_rect.y + title_pad_rect.h + MARGIN,
+        .w = absolute_rect.w - w_padding,
+        .h = absolute_rect.h * 0.30f};
 
     const struct nk_color success_midi = nk_rgba(74, 222, 128, 255);
     const struct nk_color failure_midi = nk_rgba(232, 97, 93, 255);
 
-    static int is_connected = 0;
+    nk_layout_space_push(ui_ctx, info_pad_rect);
 
-    nk_layout_space_push(ctx, connected_pad_rect);
-
-    if (nk_group_begin(ctx, "connected_label", NK_WINDOW_NO_SCROLLBAR))
+    if (nk_group_begin(ui_ctx, "device_info", NK_WINDOW_NO_SCROLLBAR))
     {
-        nk_layout_row_dynamic(ctx, connected_pad_rect.h, 2);
+        nk_layout_row_dynamic(ui_ctx, 24, 1);
 
-        if (nk_button_label(ctx, "CONNECT"))
+        if (app_ctx->device.device_info != NULL)
         {
-            // pass the id and connect
-            PmError error = midi_connect_device(device_selected);
-
-            if (error == pmNoError)
-            {
-                is_connected = 1;
-            }
-
-            const PmDeviceInfo *device = Pm_GetDeviceInfo(device_selected);
-            fprintf(stderr, "\n%s\n\n", device->name);
-        }
-
-        if (!is_connected)
-        {
-            nk_label_colored(ctx, "Not Connected", NK_TEXT_CENTERED, failure_midi);
+            nk_label_colored(ui_ctx, app_ctx->device.device_info->name, NK_TEXT_LEFT, success_midi);
         }
         else
         {
-            nk_label_colored(ctx, "Connected", NK_TEXT_CENTERED, success_midi);
+            nk_label_colored(ui_ctx, "Not Connected", NK_TEXT_CENTERED, failure_midi);
         }
 
-        nk_group_end(ctx);
-    }
-
-    // SCAN DEVICES BUTTON
-    struct nk_rect scan_devices_pad_rect = {
-        .x = absolute_rect.x + (MARGIN * 2.0f),
-        .y = absolute_rect.y + title_pad_rect.h + device_pad_rect.h + connected_pad_rect.h + (MARGIN * 2.0f),
-        .w = absolute_rect.w - (MARGIN * 4.0f),
-        .h = absolute_rect.h * 0.15};
-
-    nk_layout_space_push(ctx, scan_devices_pad_rect);
-
-    if (nk_group_begin(ctx, "scan_devices_button", NK_WINDOW_NO_SCROLLBAR))
-    {
-        nk_layout_row_dynamic(ctx, scan_devices_pad_rect.h, 1);
-
-        if (nk_button_label(ctx, "SCAN FOR DEVICES"))
-        {
-            // refresh midi connection each frame
-            midi_refresh();
-            app_ctx->connected_devices = midi_get_connected_devices();
-        }
-        nk_group_end(ctx);
+        nk_group_end(ui_ctx);
     }
 };

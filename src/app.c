@@ -6,7 +6,7 @@
 #include "ui/vendor/raylib-nuklear.h"
 
 // shared
-#include "app_init.h"
+#include "app.h"
 #include "ui/theme.h"
 #include "midi/midi.h"
 #include "csv_reader/csv_reader.h"
@@ -47,15 +47,14 @@ int app_init(void)
     }
 
     // SETUP UI CONTEXT
+
     // initializes a window and OpenGL context. Set's up a temporary 1x1 window.
     InitWindow(1, 1, UI_NAME);
     struct nk_vec2 monitor_dimensions = get_monitor_dimensions();
 
     // resizes the current window to the monitor dimensions and toggles fullscreen mode.
     SetWindowSize(monitor_dimensions.x, monitor_dimensions.y);
-    ToggleFullscreen();
-
-    printf("Actual screen size: %d x %d\n", GetScreenWidth(), GetScreenHeight());
+    // ToggleFullscreen();
 
     // *filename is relative to the project root directory
     Font font = LoadFontEx("assets/fonts/inter/Inter_18pt-Regular.ttf", 18.0f, NULL, 0);
@@ -65,7 +64,7 @@ int app_init(void)
 
     if (nk_ctx == NULL)
     {
-        fprintf(stderr, "Failed to initialize the UI context.");
+        fprintf(stderr, "Failed to initialize the UI context.\n");
         return -1;
     }
 
@@ -76,20 +75,22 @@ int app_init(void)
     nk_ctx->style.window.group_padding = nk_vec2(0, 0);
 
     // SETUP MIDI
-    // start portMidi and search for devices.
-    int num_of_devices = midi_initialize();
+    int error = midi_initialize(&app_ctx.device);
 
-    if (num_of_devices == 0)
+    if (error == -1)
     {
-        fprintf(stderr, "main: no devices found\n");
+        fprintf(stderr, "ERROR: failed to initialize midi - midi_initialize()\n");
         return -1;
     }
 
-    // SETUP APP CONTEXT
-    // init connected devices
-    app_ctx.connected_devices = midi_get_connected_devices();
-
     return 0;
+}
+
+void app_terminate()
+{
+    midi_terminate();
+    UnloadNuklear(nk_ctx);
+    CloseWindow();
 }
 
 // returns the current monitor's dimensions

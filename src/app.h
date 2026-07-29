@@ -10,10 +10,12 @@
 
 typedef struct
 {
-    ConnectedDevices *connected_devices;
+    MidiDevice device;
+    PmEvent event;
 } AppContext;
 
-int app_init(void);
+int app_init();
+void app_terminate();
 struct nk_vec2 get_monitor_dimensions(void);
 AppContext *app_get_context(void);
 struct nk_context *app_get_ui_context(void);
