@@ -88,6 +88,8 @@ void draw_midi_device_container(struct nk_context *ui_ctx, AppContext *app_ctx)
         // NOTE: have to account for null terminator
         nk_style_push_font(ui_ctx, app_get_title_font());
 
+        // NOTE: library function used to write formatted text into a sized character buffer
+
         // NAME
         char name[50];
         snprintf(name, sizeof(name), "Name: %s", app_ctx->device.device_info->name);

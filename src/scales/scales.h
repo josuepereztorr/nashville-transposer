@@ -43,10 +43,12 @@ static const int *lookup_table[12] = {
     scale_c, scale_c_sharp, scale_d, scale_d_sharp, scale_e, scale_f,
     scale_f_sharp, scale_g, scale_g_sharp, scale_a, scale_a_sharp, scale_b};
 
+// used for dropdown strings
 static const char *major_scales[12] = {
     "C Major", "C# Major", "D Major", "D# Major", "E Major", "F Major",
     "F# Major", "G Major", "G# Major", "A Major", "A# Major", "B Major"};
 
+// used to fill UI labels
 static const char *note_names[12] = {
     "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 

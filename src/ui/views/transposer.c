@@ -141,28 +141,33 @@ void draw_transposer_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 
 static void update_note_display(AppContext *app_ctx, TransposerDisplay *display)
 {
-    // get the decoded message
+    // extract the status byte
     int status = Pm_MessageStatus(app_ctx->event.message);
 
-    //
+    // isolate the message type (upper nibble), strip out the channel (lower nibble)
+    // filter out the channel number, keep the Note Type "mask"
     int type = status & 0xF0;
 
-    // CASE #1 - NOTE DEPRESSED
+    // ignore anything that isn't a genuine key press (wrong message type, or velocity 0 = a disguised note-off)
+    // HEX: 0x90 - "9" Note On, "0" Channel 1
     if (type != 0x90 || Pm_MessageData2(app_ctx->event.message) <= 0)
     {
         return;
     }
 
-    // CURRENT NOTE
+    // grab the raw midi note number (0-127) from the message
     int played_note = Pm_MessageData1(app_ctx->event.message);
+
+    // reduce the note to its chromatic position (0-11) within the octave
     int chromatic_position = played_note % 12;
 
+    // update the current note label with it's note name
     snprintf(display->current_note_display, sizeof(display->current_note_display), "%s", note_names[chromatic_position]);
 
     // get the scale degree passing in the midi_note
     int degree = get_scale_degree(played_note, app_ctx->current_key_selected);
 
-    // note is not in scale, don't do any ui changes
+    // note isn't in the scale — reset the nashville/target displays to placeholders and stop
     if (degree == -1)
     {
         snprintf(display->nashville_display, sizeof(display->nashville_display), "-");
@@ -170,14 +175,18 @@ static void update_note_display(AppContext *app_ctx, TransposerDisplay *display)
         return;
     }
 
+    // update the number degree label with the scale degree
     snprintf(display->nashville_display, sizeof(display->nashville_display), "%d", degree);
 
+    // convert the scale degree into the equivalent
     int transposed_semitone = get_transposed_note(degree, app_ctx->target_key_selected);
 
+    // degree coudln't be transposed or the note isn't in the scale, dont' change UI
     if (transposed_semitone == -1)
     {
         return;
     }
 
+    // update target note with the updated value
     snprintf(display->target_note_display, sizeof(display->target_note_display), "%s", note_names[transposed_semitone]);
 }
