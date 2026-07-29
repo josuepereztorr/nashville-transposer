@@ -59,7 +59,7 @@ void draw_layout(struct nk_context *ui_ctx, AppContext *app_ctx)
         nk_layout_row_dynamic(ui_ctx, half_height, 1);
         if (nk_group_begin(ui_ctx, "scale_selection", NK_WINDOW_NO_SCROLLBAR))
         {
-            draw_scale_selection_container(ui_ctx);
+            draw_scale_selection_container(ui_ctx, app_ctx);
             nk_group_end(ui_ctx);
         }
         nk_group_end(ui_ctx);
@@ -69,7 +69,7 @@ void draw_layout(struct nk_context *ui_ctx, AppContext *app_ctx)
     nk_layout_row_push(ui_ctx, HALF_WIDTH_RATIO);
     if (nk_group_begin(ui_ctx, "transposer", NK_WINDOW_NO_SCROLLBAR))
     {
-        draw_transposer_container(ui_ctx);
+        draw_transposer_container(ui_ctx, app_ctx);
         nk_group_end(ui_ctx);
     }
 
@@ -109,7 +109,7 @@ void draw_layout(struct nk_context *ui_ctx, AppContext *app_ctx)
     nk_layout_row_dynamic(ui_ctx, lower_height, 1);
     if (nk_group_begin(ui_ctx, "keyboard", NK_WINDOW_NO_SCROLLBAR))
     {
-        draw_keyboard_container(ui_ctx);
+        draw_keyboard_container(ui_ctx, app_ctx);
         nk_group_end(ui_ctx);
     }
 }
@@ -159,6 +159,8 @@ void draw_dropdown(struct nk_context *ui_ctx, struct nk_rect padding_container, 
 
 void draw_title_label(struct nk_context *ui_ctx, const char *title, float row_height)
 {
+    nk_style_push_font(ui_ctx, app_get_title_font());
     nk_layout_row_dynamic(ui_ctx, row_height, 1);
     nk_label_colored(ui_ctx, title, NK_TEXT_LEFT, NK_PRIMARY_TEXT_COLOR);
+    nk_style_pop_font(ui_ctx);
 }

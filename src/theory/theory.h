@@ -11,9 +11,9 @@ typedef struct
 
 typedef struct
 {
-      const char *current_note;
-      const char *target_note;
-      const char *nashville_num;
+      char *current_note;
+      char *target_note;
+      char *nashville_num;
 } NoteResult;
 
 /* Parses the provided row into a Note and loads it into keyboard[]. */

@@ -10,7 +10,6 @@
 
 #include "midi/midi.h"
 #include "ui/theme.h"
-#include "ui/ui.h"
 
 // views
 #include "ui/views/layout.h"

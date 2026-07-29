@@ -4,6 +4,9 @@
 // vendors
 #include "../vendor/raylib-nuklear.h"
 
-void draw_keyboard_container(struct nk_context *ctx);
+// shared
+#include "../../app.h"
+
+void draw_keyboard_container(struct nk_context *ui_ctx, AppContext *app_ctx);
 
 #endif

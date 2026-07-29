@@ -16,9 +16,16 @@
 
 #define CSV_DATA_PATH "./data/midi_notes.csv"
 #define UI_NAME "Nashville Transposer"
+#define FONT_PATH "assets/fonts/inter/Inter_18pt-Regular.ttf"
 
 static AppContext app_ctx = {0};
 static struct nk_context *nk_ctx = NULL;
+
+static Font font_title = {0};
+static struct nk_user_font nk_font_title = {0};
+
+static Font font_display = {0};
+static struct nk_user_font nk_font_display = {0};
 
 // Initializes a window based on the monitor dimensions and initializes a Nuklear context.
 int app_init(void)
@@ -54,10 +61,10 @@ int app_init(void)
 
     // resizes the current window to the monitor dimensions and toggles fullscreen mode.
     SetWindowSize(monitor_dimensions.x, monitor_dimensions.y);
-    // ToggleFullscreen();
+    ToggleFullscreen();
 
     // *filename is relative to the project root directory
-    Font font = LoadFontEx("assets/fonts/inter/Inter_18pt-Regular.ttf", 18.0f, NULL, 0);
+    Font font = LoadFontEx(FONT_PATH, 18.0f, NULL, 0);
 
     // initializes the Nuklear context for use with Raylib. Loads the default font and sets up GL resources.
     nk_ctx = InitNuklearEx(font, 18.0f);
@@ -67,6 +74,18 @@ int app_init(void)
         fprintf(stderr, "Failed to initialize the UI context.\n");
         return -1;
     }
+
+    // add add' font sizes
+    font_title = LoadFontEx(FONT_PATH, 24.0f, NULL, 0);
+    nk_font_title.userdata = nk_handle_ptr(&font_title);
+    nk_font_title.height = 24.0f;
+    nk_font_title.width = nk_raylib_font_get_text_width_user_font;
+
+    font_display = LoadFontEx("assets/fonts/inter/Inter_18pt-Regular.ttf", 150.0f, NULL, 0);
+
+    nk_font_display.userdata = nk_handle_ptr(&font_display);
+    nk_font_display.height = 150.0f;
+    nk_font_display.width = nk_raylib_font_get_text_width_user_font;
 
     // global parameters
     nk_ctx->style.window.fixed_background = nk_style_item_color(NK_TRANSPARENT);
@@ -111,4 +130,14 @@ AppContext *app_get_context(void)
 struct nk_context *app_get_ui_context(void)
 {
     return nk_ctx;
+}
+
+struct nk_user_font *app_get_title_font(void)
+{
+    return &nk_font_title;
+}
+
+struct nk_user_font *app_get_display_font(void)
+{
+    return &nk_font_display;
 }

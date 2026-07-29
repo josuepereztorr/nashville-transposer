@@ -3,7 +3,8 @@
 
 // vendor
 #include "../vendor/raylib-nuklear.h"
+#include "../../app.h"
 
-void draw_transposer_container(struct nk_context *ctx);
+void draw_transposer_container(struct nk_context *ctx, AppContext *app_ctx);
 
 #endif

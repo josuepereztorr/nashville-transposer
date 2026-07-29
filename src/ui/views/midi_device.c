@@ -49,9 +49,9 @@ void draw_midi_device_container(struct nk_context *ui_ctx, AppContext *app_ctx)
     // CONNECTED LABEL
     struct nk_rect info_pad_rect = {
         .x = absolute_rect.x + x_padding,
-        .y = title_pad_rect.y + title_pad_rect.h + MARGIN,
+        .y = title_pad_rect.y + title_pad_rect.h,
         .w = absolute_rect.w - w_padding,
-        .h = absolute_rect.h * 0.30f};
+        .h = absolute_rect.h};
 
     const struct nk_color success_midi = nk_rgba(74, 222, 128, 255);
     const struct nk_color failure_midi = nk_rgba(232, 97, 93, 255);
@@ -60,16 +60,27 @@ void draw_midi_device_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 
     if (nk_group_begin(ui_ctx, "device_info", NK_WINDOW_NO_SCROLLBAR))
     {
-        nk_layout_row_dynamic(ui_ctx, 24, 1);
+        // NOTE: have to account for null terminator
+        nk_style_push_font(ui_ctx, app_get_title_font());
 
-        if (app_ctx->device.device_info != NULL)
-        {
-            nk_label_colored(ui_ctx, app_ctx->device.device_info->name, NK_TEXT_LEFT, success_midi);
-        }
-        else
-        {
-            nk_label_colored(ui_ctx, "Not Connected", NK_TEXT_CENTERED, failure_midi);
-        }
+        // NAMEs
+        char name[50];
+        snprintf(name, sizeof(name), "Name: %s", app_ctx->device.device_info->name);
+        nk_layout_row_dynamic(ui_ctx, title_height, 1);
+        nk_label_colored(ui_ctx, name, NK_TEXT_LEFT, NK_PRIMARY_TEXT_COLOR);
+
+        // INPUT TYPE
+        char type[20];
+        snprintf(type, sizeof(type), "Type: %s", app_ctx->device.device_info->input ? "Input" : "Output");
+        nk_layout_row_dynamic(ui_ctx, title_height, 1);
+        nk_label_colored(ui_ctx, type, NK_TEXT_LEFT, NK_PRIMARY_TEXT_COLOR);
+
+        // DEVICE ID
+        char id[20];
+        snprintf(id, sizeof(id), "ID: %d", app_ctx->device.id);
+        nk_layout_row_dynamic(ui_ctx, title_height, 1);
+        nk_label_colored(ui_ctx, id, NK_TEXT_LEFT, NK_PRIMARY_TEXT_COLOR);
+        nk_style_pop_font(ui_ctx);
 
         nk_group_end(ui_ctx);
     }
