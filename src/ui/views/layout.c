@@ -1,3 +1,28 @@
+/*
+ * ============================================================
+ * File    : layout.c
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description:
+ *     Builds the main app layout (upper card row + keyboard row)
+ *     and provides shared UI drawing helpers used across views.
+ * ============================================================
+ * Dependencies:
+ *     raylib.h (vendor) - windowing/rendering.
+ *     raylib-nuklear.h (vendor) - Nuklear + Raylib integration.
+ * ============================================================
+ */
+
+// ------------------------------------------------------------
+// INCLUDES
+// ------------------------------------------------------------
+
+// file header
 #include "layout.h"
 
 // std lib
@@ -18,15 +43,23 @@
 #include "transposer.h"
 #include "keyboard.h"
 
+// ------------------------------------------------------------
+// CONSTANT & MACROS
+// ------------------------------------------------------------
+
 #define UPPER_HEIGHT_RATIO 0.6f
 #define LOWER_HEIGHT_RATIO 0.4f
 #define QUARTER_WIDTH_RATIO 0.25f
 #define HALF_WIDTH_RATIO 0.5f
 
-// draws the main app containers based on a Nuklear's row/column layout.
+// ------------------------------------------------------------
+// PUBLIC FUNCTIONS
+// ------------------------------------------------------------
+
+// draws the main app containers based on Nuklear's row/column layout.
 void draw_layout(struct nk_context *ui_ctx, AppContext *app_ctx)
 {
-    // get the screen size and spit it up into ratio of 60/40
+    // get the screen size and split it up into a ratio of 60/40
     struct nk_vec2 monitor_size = get_monitor_dimensions();
     float upper_height = monitor_size.y * UPPER_HEIGHT_RATIO;
     float lower_height = monitor_size.y * LOWER_HEIGHT_RATIO;
@@ -36,7 +69,7 @@ void draw_layout(struct nk_context *ui_ctx, AppContext *app_ctx)
     nk_layout_row_begin(ui_ctx, NK_DYNAMIC, upper_height, 3);
 
     // COLUMN #1 - Left Column
-    // creates a column specifed by the given ratio + customizes with the provided flags
+    // creates a column specified by the given ratio + customizes with the provided flags
     nk_layout_row_push(ui_ctx, QUARTER_WIDTH_RATIO);
 
     // all Nuklear widgets are enclosed in nk_group_begin() and nk_group_end() function calls.

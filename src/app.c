@@ -1,3 +1,28 @@
+/*
+ * ============================================================
+ * File    : app.c
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description:
+ *     Initializes the application window, Nuklear UI context,
+ *     fonts, and MIDI connection at startup. Provides accessors
+ *     for shared app state and UI context.
+ * ============================================================
+ * Dependencies:
+ *     raylib.h (vendor) - windowing/rendering.
+ *     raylib-nuklear.h (vendor) - Nuklear + Raylib integration.
+ * ============================================================
+ */
+
+// ------------------------------------------------------------
+// INCLUDES
+// ------------------------------------------------------------
+
 // std
 #include <stdio.h>
 
@@ -9,14 +34,17 @@
 #include "app.h"
 #include "ui/theme.h"
 #include "midi/midi.h"
-#include "csv_reader/csv_reader.h"
-#include "theory/theory.h"
 
-// views
+// ------------------------------------------------------------
+// CONSTANT & MACROS
+// ------------------------------------------------------------
 
-#define CSV_DATA_PATH "./data/midi_notes.csv"
 #define UI_NAME "Nashville Transposer"
 #define FONT_PATH "assets/fonts/inter/Inter_18pt-Regular.ttf"
+
+// ------------------------------------------------------------
+// PRIVATE VARIABLES
+// ------------------------------------------------------------
 
 static AppContext app_ctx = {0};
 static struct nk_context *nk_ctx = NULL;
@@ -27,32 +55,13 @@ static struct nk_user_font nk_font_title = {0};
 static Font font_display = {0};
 static struct nk_user_font nk_font_display = {0};
 
+// ------------------------------------------------------------
+// PUBLIC FUNCTIONS
+// ------------------------------------------------------------
+
 // Initializes a window based on the monitor dimensions and initializes a Nuklear context.
 int app_init(void)
 {
-    // SETUP DATA LAYER
-    // get data from csv
-    char rows[CSV_MAX_ROWS][CSV_MAX_BUFFER_SIZE] = {0};
-    int rows_read = csv_read(CSV_DATA_PATH, rows);
-
-    if (rows_read < 0)
-    {
-        fprintf(stderr, "csv_read: failed to load data from '%s' or there was an error during reading\n", CSV_DATA_PATH);
-        return -1;
-    }
-
-    // parse and load data into memory
-    for (int row = 0; row < rows_read; row++)
-    {
-        int error = theory_row_parser(rows[row]);
-
-        if (error < 0)
-        {
-            fprintf(stderr, "theory_row_parser: failed to parse the string\n");
-            return -1;
-        }
-    }
-
     // SETUP UI CONTEXT
 
     // initializes a window and OpenGL context. Set's up a temporary 1x1 window.
@@ -75,14 +84,13 @@ int app_init(void)
         return -1;
     }
 
-    // add add' font sizes
+    // add additional font sizes
     font_title = LoadFontEx(FONT_PATH, 24.0f, NULL, 0);
     nk_font_title.userdata = nk_handle_ptr(&font_title);
     nk_font_title.height = 24.0f;
     nk_font_title.width = nk_raylib_font_get_text_width_user_font;
 
-    font_display = LoadFontEx("assets/fonts/inter/Inter_18pt-Regular.ttf", 150.0f, NULL, 0);
-
+    font_display = LoadFontEx(FONT_PATH, 150.0f, NULL, 0);
     nk_font_display.userdata = nk_handle_ptr(&font_display);
     nk_font_display.height = 150.0f;
     nk_font_display.width = nk_raylib_font_get_text_width_user_font;
@@ -105,7 +113,7 @@ int app_init(void)
     return 0;
 }
 
-void app_terminate()
+void app_terminate(void)
 {
     midi_terminate();
     UnloadNuklear(nk_ctx);

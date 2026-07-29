@@ -1,3 +1,27 @@
+/*
+ * ============================================================
+ * File    : midi_device.c
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description:
+ *     Draws the MIDI device info card, showing the connected
+ *     device's name, input/output type, and ID.
+ * ============================================================
+ * Dependencies:
+ *     raylib-nuklear.h (vendor) - Nuklear + Raylib integration.
+ * ============================================================
+ */
+
+// ------------------------------------------------------------
+// INCLUDES
+// ------------------------------------------------------------
+
+// file header
 #include "midi_device.h"
 
 // std lib
@@ -13,6 +37,10 @@
 
 // views
 #include "layout.h"
+
+// ------------------------------------------------------------
+// PUBLIC FUNCTIONS
+// ------------------------------------------------------------
 
 void draw_midi_device_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 {
@@ -53,9 +81,6 @@ void draw_midi_device_container(struct nk_context *ui_ctx, AppContext *app_ctx)
         .w = absolute_rect.w - w_padding,
         .h = absolute_rect.h};
 
-    const struct nk_color success_midi = nk_rgba(74, 222, 128, 255);
-    const struct nk_color failure_midi = nk_rgba(232, 97, 93, 255);
-
     nk_layout_space_push(ui_ctx, info_pad_rect);
 
     if (nk_group_begin(ui_ctx, "device_info", NK_WINDOW_NO_SCROLLBAR))
@@ -63,7 +88,7 @@ void draw_midi_device_container(struct nk_context *ui_ctx, AppContext *app_ctx)
         // NOTE: have to account for null terminator
         nk_style_push_font(ui_ctx, app_get_title_font());
 
-        // NAMEs
+        // NAME
         char name[50];
         snprintf(name, sizeof(name), "Name: %s", app_ctx->device.device_info->name);
         nk_layout_row_dynamic(ui_ctx, title_height, 1);
@@ -84,4 +109,4 @@ void draw_midi_device_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 
         nk_group_end(ui_ctx);
     }
-};
+}

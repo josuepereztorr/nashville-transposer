@@ -1,3 +1,28 @@
+/*
+ * ============================================================
+ * File    : main.c
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description:
+ *     Application entry point. Initializes the app and MIDI
+ *     connection, runs the main render/update loop, and handles
+ *     shutdown.
+ * ============================================================
+ * Dependencies:
+ *     raylib.h (vendor) - windowing/rendering.
+ *     raylib-nuklear.h (vendor) - Nuklear + Raylib integration.
+ * ============================================================
+ */
+
+// ------------------------------------------------------------
+// INCLUDES
+// ------------------------------------------------------------
+
 // std
 #include <stdio.h>
 
@@ -7,17 +32,24 @@
 
 // shared
 #include "app.h"
-
 #include "midi/midi.h"
 #include "ui/theme.h"
 
 // views
 #include "ui/views/layout.h"
 
-AppContext *app_ctx = NULL;
-struct nk_context *ui_ctx = NULL;
+// ------------------------------------------------------------
+// PRIVATE VARIABLES
+// ------------------------------------------------------------
 
-int main()
+static AppContext *app_ctx = NULL;
+static struct nk_context *ui_ctx = NULL;
+
+// ------------------------------------------------------------
+// PUBLIC FUNCTIONS
+// ------------------------------------------------------------
+
+int main(void)
 {
     // buffering set to unbuffered
     setbuf(stdout, NULL);
@@ -47,7 +79,6 @@ int main()
         UpdateNuklear(ui_ctx);
 
         app_ctx->event = midi_read();
-        fprintf(stderr, "\nMIDI EVENT: %d\n\n", Pm_MessageStatus(app_ctx->event.message));
 
         // window size
         struct nk_rect window_size = nk_rect(0, 0, monitor_size.x, monitor_size.y);
@@ -69,7 +100,5 @@ int main()
     // release resources
     app_terminate();
 
-    /* ----------------------------------------------------------------------------------------------------------*/
-
     return 0;
-};
+}

@@ -1,17 +1,45 @@
+/*
+ * ============================================================
+ * File    : midi.h
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description:
+ *     Public interface for MIDI device connection, reading,
+ *     and termination via the PortMidi API.
+ * ============================================================
+ * Dependencies:
+ *     portmidi.h (brew) - MIDI device I/O.
+ * ============================================================
+ */
+
 #ifndef MIDI_H
 #define MIDI_H
+
+// ------------------------------------------------------------
+// INCLUDES
+// ------------------------------------------------------------
 
 // vendor
 #include <portmidi.h>
 
-// the max number of devices that can be connected
-#define MAX_DEVICES 10
+// ------------------------------------------------------------
+// TYPE DEFINITIONS
+// ------------------------------------------------------------
 
 typedef struct
 {
    int id;
    const PmDeviceInfo *device_info;
 } MidiDevice;
+
+// ------------------------------------------------------------
+// PUBLIC FUNCTION PROTOTYPES
+// ------------------------------------------------------------
 
 // Initializes PortMidi and connects specifically to the Arturia MiniLab 3.
 int midi_initialize(MidiDevice *device);

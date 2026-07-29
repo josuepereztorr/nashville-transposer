@@ -1,12 +1,44 @@
+/*
+ * ============================================================
+ * File    : scales.c
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description:
+ *     Converts between MIDI note numbers and Nashville Number
+ *     System (NNS) scale degrees, using the chromatic lookup tables
+ *     defined in scales.h.
+ * ============================================================
+ * Dependencies:
+ *     None.
+ * ============================================================
+ */
+
+// ------------------------------------------------------------
+// INCLUDES
+// ------------------------------------------------------------
+
+// file header
 #include "scales.h"
 
+// ------------------------------------------------------------
+// CONSTANT & MACROS
+// ------------------------------------------------------------
+
 #define OCTAVE 12
+
+// ------------------------------------------------------------
+// PUBLIC FUNCTIONS
+// ------------------------------------------------------------
 
 /* given a midi note (midi number 0-127) and a key (as semitone 0-11), return the corresponding scale degree (1-7).
    returns -1 if the note is not in the scale or a value (1-7) for the scale degree */
 int get_scale_degree(int midi_note, int key_root)
 {
-
     // PART 1: CHECK IF THE MIDI NOTE IS IN THE SCALE
 
     // calculates the chromatic scale position (0-11) ex. C would be 0, g would be 7 etc
@@ -24,9 +56,8 @@ int get_scale_degree(int midi_note, int key_root)
         return -1;
     }
 
-    // PART 2: FIND THE THE DEGREE RELATIVE TO THE MAJOR SCALE
-    // walks up the chromatic scale starting at root_key until it reaches the midi_note postiion (0-11)
-    // the degree
+    // PART 2: FIND THE DEGREE RELATIVE TO THE MAJOR SCALE
+    // walks up the chromatic scale starting at root_key until it reaches the midi_note position (0-11)
     int major_scale_degree = 0;
     for (int offset = 0; offset < OCTAVE; offset++)
     {
@@ -70,7 +101,7 @@ int get_transposed_note(int input_degree, int target_key_index)
         {
             major_scale_degree++;
 
-            // if the both degrees match, return the position
+            // if both degrees match, return the position
             if (major_scale_degree == input_degree)
             {
                 return position;

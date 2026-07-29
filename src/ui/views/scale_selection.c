@@ -7,7 +7,7 @@
 
 // shared
 #include "../theme.h"
-#include "../../theory/scales.h"
+#include "../../scales/scales.h"
 
 // views
 #include "layout.h"

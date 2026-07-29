@@ -1,3 +1,29 @@
+/*
+ * ============================================================
+ * File    : keyboard.c
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description:
+ *     Builds and renders the on-screen piano keyboard, including
+ *     white/black note layout, positioning, and pressed-state
+ *     coloring.
+ * ============================================================
+ * Dependencies:
+ *     raylib.h (vendor) - windowing/rendering.
+ *     raylib-nuklear.h (vendor) - Nuklear + Raylib integration.
+ * ============================================================
+ */
+
+// ------------------------------------------------------------
+// INCLUDES
+// ------------------------------------------------------------
+
+// file header
 #include "keyboard.h"
 
 // std lib
@@ -14,14 +40,18 @@
 // views
 #include "layout.h"
 
-// LOGIC
+// ------------------------------------------------------------
+// CONSTANT & MACROS
+// ------------------------------------------------------------
+
+// logic
 #define NUM_OF_OCTAVES 3
 #define NOTES_IN_OCTAVE 12
 #define WHT_NOTES_IN_OCTAVE 7
 #define TOTAL_NOTES (NUM_OF_OCTAVES * NOTES_IN_OCTAVE)
 #define TOTAL_WHT_NOTES (NUM_OF_OCTAVES * WHT_NOTES_IN_OCTAVE)
 
-// UI
+// ui
 #define TOTAL_NOTE_PADDING (TOTAL_WHT_NOTES * WHT_NOTE_TRAIL_PADDING)
 #define X_OFFSET_MARGIN 20.0f
 #define Y_OFFSET_MARGIN 20.0f
@@ -31,11 +61,9 @@
 #define WHT_NOTE_ROUNDNESS 6.0f
 #define CONT_UPPER_HEIGHT_RATIO 0.6f
 
-typedef struct
-{
-    struct nk_rect rec;
-    struct nk_color color;
-} UIRectangle;
+// ------------------------------------------------------------
+// TYPE DEFINITIONS
+// ------------------------------------------------------------
 
 typedef struct
 {
@@ -44,6 +72,10 @@ typedef struct
     int is_pressed;
     int id;
 } UINote;
+
+// ------------------------------------------------------------
+// PRIVATE VARIABLES
+// ------------------------------------------------------------
 
 static UINote notes[NOTES_IN_OCTAVE * NUM_OF_OCTAVES] = {0};
 
@@ -63,11 +95,19 @@ static const int is_blk_note[12] = {
     1,  // A#
     0}; // B
 
+// ------------------------------------------------------------
+// PRIVATE FUNCTION PROTOTYPES
+// ------------------------------------------------------------
+
 static int get_wht_note_width(struct nk_rect rec);
 static UINote create_wht_note(int note_index, const struct nk_rect container);
-static void draw_wht_notes(struct nk_context *ui_ctx, AppContext *app_ctx, int note_index, struct nk_rect container);
 static UINote create_blk_note(int note_index, const struct nk_rect container);
+static void draw_wht_notes(struct nk_context *ui_ctx, AppContext *app_ctx, int note_index, struct nk_rect container);
 static void draw_blk_notes(struct nk_context *ui_ctx, AppContext *app_ctx, int note_index, const struct nk_rect container);
+
+// ------------------------------------------------------------
+// PUBLIC FUNCTIONS
+// ------------------------------------------------------------
 
 void draw_keyboard_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 {
@@ -79,7 +119,11 @@ void draw_keyboard_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 
     wht_note_index = 0;
     draw_blk_notes(ui_ctx, app_ctx, wht_note_index, keyboard_rect);
-};
+}
+
+// ------------------------------------------------------------
+// PRIVATE FUNCTIONS
+// ------------------------------------------------------------
 
 static int get_wht_note_width(struct nk_rect rec)
 {
@@ -104,6 +148,7 @@ static UINote create_wht_note(int note_index, const struct nk_rect container)
 
     return note;
 }
+
 static UINote create_blk_note(int note_index, const struct nk_rect container)
 {
     int wht_note_width = get_wht_note_width(container);
@@ -169,7 +214,7 @@ static void draw_blk_notes(struct nk_context *ui_ctx, AppContext *app_ctx, int n
     {
         int degree = midi_index % 12;
 
-        if (!is_blk_note[degree % 12])
+        if (!is_blk_note[degree])
         {
             note_index++;
         }

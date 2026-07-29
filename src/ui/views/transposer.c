@@ -1,3 +1,28 @@
+/*
+ * ============================================================
+ * File    : transposer.c
+ * Project : Nashville Transposer
+ * ============================================================
+ * Author   : Josue Perez Torres
+ * Created  : 07-28-2026
+ * Modified : 07-28-2026
+ * Version  : 1.0.0
+ * ============================================================
+ * Description:
+ *     Draws the transposer card, showing the current note,
+ *     Nashville number, and transposed target note based on
+ *     live MIDI input.
+ * ============================================================
+ * Dependencies:
+ *     raylib-nuklear.h (vendor) - Nuklear + Raylib integration.
+ * ============================================================
+ */
+
+// ------------------------------------------------------------
+// INCLUDES
+// ------------------------------------------------------------
+
+// file header
 #include "transposer.h"
 
 // std lib
@@ -8,11 +33,15 @@
 
 // shared
 #include "../theme.h"
-#include "../../theory/scales.h"
+#include "../../scales/scales.h"
 #include "../../app.h"
 
 // views
 #include "layout.h"
+
+// ------------------------------------------------------------
+// TYPE DEFINITIONS
+// ------------------------------------------------------------
 
 typedef struct
 {
@@ -21,7 +50,15 @@ typedef struct
     char nashville_display[10];
 } TransposerDisplay;
 
+// ------------------------------------------------------------
+// PRIVATE FUNCTION PROTOTYPES
+// ------------------------------------------------------------
+
 static void update_note_display(AppContext *app_ctx, TransposerDisplay *display);
+
+// ------------------------------------------------------------
+// PUBLIC FUNCTIONS
+// ------------------------------------------------------------
 
 void draw_transposer_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 {
@@ -96,7 +133,11 @@ void draw_transposer_container(struct nk_context *ui_ctx, AppContext *app_ctx)
 
         nk_group_end(ui_ctx);
     }
-};
+}
+
+// ------------------------------------------------------------
+// PRIVATE FUNCTIONS
+// ------------------------------------------------------------
 
 static void update_note_display(AppContext *app_ctx, TransposerDisplay *display)
 {
